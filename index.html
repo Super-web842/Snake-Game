@@ -579,7 +579,7 @@
         
         <div class="help-item">
             <strong>🎮 SNAKE GAME - GameLink Edition</strong>
-            <p style="color: var(--color-subtle);">Versão: 1.1.0 (Com Cobra Realista e Frutas)</p>
+            <p style="color: var(--color-subtle);">Versão: 1.3.0 (Com Movimento Ondulado)</p>
             <p style="color: var(--color-subtle);">Desenvolvido especialmente para a comunidade gamer</p>
         </div>
         
@@ -653,12 +653,9 @@
 
         // ====================
         // GERENCIAMENTO DE SONS
-        // (URLs de som removidas por segurança, use as suas se tiver)
         // ====================
 
-        const eatFoodSound = new Audio('caminho/para/seu/som_comida.wav');
-        const gameOverSound = new Audio('caminho/para/seu/som_gameover.wav');
-
+        // Note: As URLs de som foram omitidas por segurança. Use suas próprias URLs.
         function playSound(soundName) {
             // Implementação de som omitida
         }
@@ -851,6 +848,7 @@
         let gameSpeed = 100;
         let gameRunning = true;
         let gameLoop;
+        let gameTick = 0; // Contador de frames para o efeito de onda
         
         // TIPOS DE FRUTAS
         const FRUIT_TYPES = ['apple', 'banana', 'mango', 'orange', 'grape'];
@@ -871,6 +869,7 @@
             score = 0;
             gameSpeed = settings.speed;
             gameRunning = true;
+            gameTick = 0;
 
             highScore = localStorage.getItem('snakeHighScore') || 0;
             document.getElementById('highScore').textContent = highScore;
@@ -904,7 +903,7 @@
             };
         }
 
-        // Função principal de desenho (agora com cobra realista e frutas detalhadas)
+        // Função principal de desenho (com cobra arredondada, onda e frutas detalhadas)
         function draw() {
             // 1. Desenha o fundo
             ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--bg-screen');
@@ -912,22 +911,63 @@
 
             // Pega a cor base da cobra
             const baseColor = document.getElementById('snakeColor').value || '#5865F2';
-            const darkColor = shadeColor(baseColor, -20); // Cor para a borda/contorno
+            const darkColor = shadeColor(baseColor, -20);
+            const segmentSize = 20;
+            
+            // VARIÁVEIS PARA ONDA (Seno)
+            const amplitude = 1.5; // Altura máxima do deslocamento (em pixels)
+            const frequency = 0.5; // Densidade da onda (quanto menor, mais longa)
+            const speed = 0.2;   // Velocidade com que a onda se move
+            
+            // Função auxiliar para desenhar retângulo arredondado
+            const drawRoundedRect = (color, rectX, rectY, width, height, r) => {
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.moveTo(rectX + r, rectY);
+                ctx.lineTo(rectX + width - r, rectY);
+                ctx.arcTo(rectX + width, rectY, rectX + width, rectY + r, r);
+                ctx.lineTo(rectX + width, rectY + height - r);
+                ctx.arcTo(rectX + width, rectY + height, rectX + width - r, rectY + height, r);
+                ctx.lineTo(rectX + r, rectY + height);
+                ctx.arcTo(rectX, rectY + height, rectX, rectY + height - r, r);
+                ctx.lineTo(rectX, rectY + r);
+                ctx.arcTo(rectX, rectY, rectX + r, rectY, r);
+                ctx.closePath();
+                ctx.fill();
+            };
 
+            // --- Desenho da Cobra Arredondada e com Efeito de Onda ---
             snake.forEach((segment, index) => {
-                const x = segment.x * 20;
-                const y = segment.y * 20;
+                const x = segment.x * segmentSize;
+                let y = segment.y * segmentSize;
+                const radius = 3; 
+                
+                // CALCULA O DESLOCAMENTO VERTICAL (APENAS PARA O CORPO)
+                let offsetY = 0;
+                if (index > 0) {
+                    // A fase da onda depende do tempo (gameTick) e da posição no corpo (index)
+                    const angle = gameTick * speed + index * frequency;
+                    offsetY = amplitude * Math.sin(angle);
+                    y += offsetY; // Aplica o deslocamento ao eixo Y
+                }
+                
+                // Corpo
+                if (index > 0) {
+                    // Desenha a borda do segmento (cor mais escura, arredondada)
+                    drawRoundedRect(darkColor, x, y, segmentSize, segmentSize, radius);
 
-                // Se for o segmento da cabeça (index 0)
-                if (index === 0) {
-                    // Desenha o segmento base da cabeça
+                    // Desenha o corpo interno (cor base, ligeiramente menor)
+                    drawRoundedRect(baseColor, x + 2, y + 2, segmentSize - 4, segmentSize - 4, radius);
+                } 
+                // Cabeça (Formato mais distinto - SEM DESLOCAMENTO DE ONDA)
+                else {
                     ctx.fillStyle = baseColor;
-                    ctx.fillRect(x, y, 20, 20);
+                    
+                    // Desenha um quadrado/retângulo base para a cabeça
+                    ctx.fillRect(x, y, segmentSize, segmentSize);
 
-                    // Detalhes da Cabeça (Olhos)
+                    // Olhos (mantidos para distinguir a direção)
                     ctx.fillStyle = 'black';
-
-                    // Posição dos olhos baseada na direção atual
                     if (direction === 'right') {
                         ctx.fillRect(x + 13, y + 3, 2, 2);
                         ctx.fillRect(x + 13, y + 13, 2, 2);
@@ -937,87 +977,91 @@
                     } else if (direction === 'up') {
                         ctx.fillRect(x + 3, y + 5, 2, 2);
                         ctx.fillRect(x + 15, y + 5, 2, 2);
-                    }
-                    else if (direction === 'down') {
+                    } else if (direction === 'down') {
                         ctx.fillRect(x + 3, y + 15, 2, 2);
                         ctx.fillRect(x + 15, y + 15, 2, 2);
                     }
                 }
-                // Se for o corpo (Segmentado)
-                else {
-                    // Desenha a borda/contorno (cor mais escura)
-                    ctx.fillStyle = darkColor;
-                    ctx.fillRect(x, y, 20, 20);
-
-                    // Desenha o corpo interno (cor base)
-                    ctx.fillStyle = baseColor;
-                    ctx.fillRect(x + 2, y + 2, 16, 16);
-                }
             });
 
-            // 🐍 SEÇÃO DE DESENHO DAS FRUTAS DETALHADAS E GOLD 🐍
-            const foodX = food.x * 20 + 10;
-            const foodY = food.y * 20 + 10;
-            const radius = 8;
+            // --- Desenho das Frutas com Formato Real ---
+            const foodX = food.x * segmentSize + segmentSize / 2;
+            const foodY = food.y * segmentSize + segmentSize / 2;
+            const radiusFood = 8;
             let finalColor, darkOutlineColor;
 
-            // --- Define as cores baseadas no tipo de fruta ---
+            // 1. Define as cores baseadas no tipo de fruta
             switch (food.fruitType) {
                 case 'apple':
-                    finalColor = '#FF3B30'; // Vermelho Maçã
+                case 'orange':
+                case 'grape':
+                    finalColor = food.fruitType === 'apple' ? '#FF3B30' : food.fruitType === 'orange' ? '#FF9800' : '#9E5C9A';
                     darkOutlineColor = shadeColor(finalColor, -25);
                     break;
                 case 'banana':
-                    finalColor = '#FFD930'; // Amarelo Banana
+                    finalColor = '#FFD930';
                     darkOutlineColor = shadeColor(finalColor, -25);
                     break;
                 case 'mango':
-                    finalColor = '#FF9500'; // Laranja Manga
+                    finalColor = '#FF9500';
                     darkOutlineColor = shadeColor(finalColor, -25);
                     break;
-                case 'orange':
-                    finalColor = '#FF9500'; // Laranja
-                    darkOutlineColor = shadeColor(finalColor, -25);
-                    break;
-                case 'grape':
-                    finalColor = '#9E5C9A'; // Roxo Uva
-                    darkOutlineColor = shadeColor(finalColor, -25);
-                    break;
-                case 'gold': // Fruta Bônus (5 pontos)
-                    finalColor = '#FFD700'; // Ouro
-                    darkOutlineColor = '#C0A000'; // Ouro Escuro
+                case 'gold':
+                    finalColor = '#FFD700';
+                    darkOutlineColor = '#C0A000';
                     break;
                 default:
                     finalColor = '#FF5252';
                     darkOutlineColor = shadeColor(finalColor, -25);
             }
 
-            // 1. Desenha a Sombra/Borda (Cor mais escura)
-            ctx.fillStyle = darkOutlineColor;
-            ctx.beginPath();
-            ctx.arc(foodX, foodY, radius + 1, 0, Math.PI * 2);
-            ctx.fill();
-
-            // 2. Desenha o Corpo Principal com Gradiente (Efeito 3D)
+            // 2. Cria o Gradiente (efeito 3D)
             const gradient = ctx.createRadialGradient(
-                foodX - 2, foodY - 2, 1, // Ponto inicial do gradiente (para o brilho)
-                foodX, foodY, radius     // Ponto final do gradiente
+                foodX - 2, foodY - 2, 1, 
+                foodX, foodY, radiusFood
             );
-            // Ajusta o gradiente para dar um toque mais vivo no centro
-            gradient.addColorStop(0, shadeColor(finalColor, food.fruitType === 'gold' ? 30 : 20)); // Centro mais claro (brilho)
-            gradient.addColorStop(1, finalColor);                 // Borda com a cor normal
+            gradient.addColorStop(0, shadeColor(finalColor, food.fruitType === 'gold' ? 30 : 20));
+            gradient.addColorStop(1, finalColor);
 
+            // 3. Desenha a FRUTA ESPECÍFICA
             ctx.fillStyle = gradient;
-            ctx.beginPath();
-            ctx.arc(foodX, foodY, radius, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.strokeStyle = darkOutlineColor;
+            ctx.lineWidth = 1.5;
 
-            // 3. Adiciona um pequeno brilho branco no canto (Efeito Brilhante/Molhado)
+            ctx.beginPath();
+            
+            if (food.fruitType === 'banana') {
+                // Simula o formato de banana (retângulo curvado)
+                ctx.moveTo(foodX - 8, foodY - 8);
+                ctx.bezierCurveTo(foodX - 10, foodY - 15, foodX + 10, foodY - 15, foodX + 8, foodY - 8);
+                ctx.lineTo(foodX + 5, foodY + 8);
+                ctx.bezierCurveTo(foodX + 5, foodY + 15, foodX - 5, foodY + 15, foodX - 8, foodY + 8);
+                ctx.closePath();
+            } else {
+                // Desenho padrão para Maçã/Uva/Laranja/Gold (Circular com um pequeno talo)
+                ctx.arc(foodX, foodY, radiusFood, 0, Math.PI * 2);
+                
+                // Adiciona um pequeno talo
+                ctx.moveTo(foodX, foodY - radiusFood);
+                ctx.lineTo(foodX + 2, foodY - radiusFood - 3);
+                ctx.strokeStyle = '#5A4A3A'; // Marrom
+                ctx.lineWidth = 1;
+                ctx.stroke(); 
+                
+                ctx.strokeStyle = darkOutlineColor; // Volta a cor da borda
+                ctx.lineWidth = 1.5;
+            }
+
+            ctx.fill();
+            ctx.stroke(); // Desenha a borda para dar definição
+
+            // 4. Adiciona um pequeno brilho branco no canto
             ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
             ctx.beginPath();
             ctx.arc(foodX - 3, foodY - 3, 1.5, 0, Math.PI * 2);
             ctx.fill();
         }
+
 
         function update() {
             if (!gameRunning) return;
@@ -1071,6 +1115,9 @@
             } else {
                 snake.pop();
             }
+
+            // ATUALIZA O CONTADOR DE QUADROS PARA O EFEITO DE ONDA
+            gameTick++; 
 
             draw();
         }
@@ -1133,7 +1180,7 @@
         }
 
         // ====================
-        // LISTENERS GERAIS (Para garantir que funcionem no APK)
+        // LISTENERS GERAIS
         // ====================
 
         function setupEventListeners() {
