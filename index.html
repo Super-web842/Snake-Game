@@ -2,49 +2,40 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Snake Game - Web842</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game Aprimorado</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        /*
-         ====================
-         VARIÁVEIS DE TEMA
-         ====================
-        */
+        /* =========================================================
+           ESTILOS CSS GERAIS E TEMA
+           ========================================================= */
+
         :root {
+            /* Tema Escuro (Padrão) */
             --color-primary: #5865F2; /* Azul Discord/Slack */
-            --color-secondary: #00FFC2; /* Ciano Neon */
-            --color-accent: #FF5252; /* Vermelho Alerta */
-            --bg-dark: #1E1E2E; /* Fundo Escuro principal */
-            --bg-screen: #2D2D44; /* Fundo das telas (Canvas) */
-            --bg-card: #383857; /* Fundo de cartões/botões */
-            --text-light: #F0F0F0;
-            --text-dark: #A0A0A0;
-            --text-subtle: #7A7A99;
-            --border-color: rgba(255, 255, 255, 0.1);
-            --shadow-primary: 0 4px 15px rgba(88, 101, 242, 0.4);
+            --color-primary-hover: #4752C4;
+            --color-accent: #1ED760; /* Verde Spotify */
+            --color-text: #F6F6F6;
+            --color-text-secondary: #AAAAAA;
+            --bg-body: #1E1E2E; /* Dark background */
+            --bg-container: #2D2D3D; /* Slightly lighter container */
+            --bg-screen: #202225; /* Tela de jogo / Menu */
+            --shadow-color: rgba(0, 0, 0, 0.4);
         }
 
-        /* Tema Claro (Light Mode) */
-        body.light-mode {
+        .light-mode {
+            /* Tema Claro */
             --color-primary: #007bff;
-            --color-secondary: #00c2ff;
-            --color-accent: #dc3545;
-            --bg-dark: #f0f0f5;
-            --bg-screen: #ffffff;
-            --bg-card: #e5e5f0;
-            --text-light: #2c3e50;
-            --text-dark: #555555;
-            --text-subtle: #888899;
-            --border-color: rgba(0, 0, 0, 0.1);
-            --shadow-primary: 0 4px 15px rgba(0, 123, 255, 0.2);
+            --color-primary-hover: #0056b3;
+            --color-accent: #28a745;
+            --color-text: #333333;
+            --color-text-secondary: #666666;
+            --bg-body: #F0F2F5;
+            --bg-container: #FFFFFF;
+            --bg-screen: #E0E2E5;
+            --shadow-color: rgba(0, 0, 0, 0.15);
         }
 
-        /*
-         ====================
-         CONFIGURAÇÕES GERAIS
-         ====================
-        */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -54,1826 +45,1063 @@
         }
 
         body {
+            background-color: var(--bg-body);
+            color: var(--color-text);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background-color: var(--bg-dark);
-            color: var(--text-light);
-            overflow: hidden; /* Importante para a animação de bolinhas */
-            perspective: 1000px; /* Para animação 3D */
-            touch-action: manipulation; /* Melhora a resposta ao toque */
+            overflow: hidden;
+            flex-direction: column;
         }
+
+        /* =========================================================
+           CONTAINERS DE TELA E ANIMAÇÕES
+           ========================================================= */
 
         .screen-container {
-            width: 100%;
-            max-width: 450px;
-            height: 95vh;
-            background-color: var(--bg-dark);
+            width: 90%;
+            max-width: 800px;
+            height: 90vh;
+            max-height: 900px;
+            background-color: var(--bg-container);
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            overflow: hidden;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            padding: 20px;
             position: relative;
+            overflow: hidden;
+            display: none; /* Escondido por padrão */
         }
 
-        /*
-         ====================
-         TELAS E TRANSIÇÕES
-         ====================
-        */
-        .menu-screen, .game-screen, .settings-screen, .ranking-screen, .help-screen, .about-screen {
+        .menu-screen, .game-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
             padding: 20px;
+            background-color: var(--bg-screen);
+            border-radius: 15px;
+        }
+
+        .settings-screen, .ranking-screen, .help-screen, .about-screen {
+            height: 100%;
             overflow-y: auto;
-            display: none; /* Controlado pelo JS */
-            flex-direction: column;
-            align-items: center;
-            background-color: var(--bg-dark);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px;
+            background-color: var(--bg-screen);
+            border-radius: 15px;
         }
 
-        /* Animação de Entrada */
-        .tela-entrando {
-            animation: slideIn 0.5s ease-out forwards;
-        }
-        /* Animação de Saída */
+        /* Classes de Animação */
+
+        /* ------------------ Transição de Saída (Slide Out) ------------------ */
         .tela-saindo {
-            animation: slideOut 0.3s ease-in forwards;
+            animation: slideOutLeft 0.3s ease-in-out forwards;
         }
 
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+        @keyframes slideOutLeft {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
         }
 
-        @keyframes slideOut {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(-100%); opacity: 0; }
+        /* ------------------ Transição de Entrada (Slide In) ------------------ */
+        .tela-entrando {
+            animation: slideInRight 0.3s ease-in-out forwards;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
 
-        /*
-         ====================
-         TÍTULOS E COMPONENTES
-         ====================
-        */
+        /* =========================================================
+           COMPONENTES DO MENU
+           ========================================================= */
+
         h1 {
             color: var(--color-primary);
-            font-size: 2.5em;
-            margin-bottom: 5px;
-            text-shadow: 0 0 10px rgba(88, 101, 242, 0.5);
+            margin-bottom: 30px;
+            font-size: 3em;
         }
 
-        h2 {
-            color: var(--color-secondary);
-            font-size: 1.5em;
-            margin-bottom: 20px;
-            text-shadow: 0 0 5px rgba(0, 255, 194, 0.4);
-        }
-
-        .logo {
-            font-size: 5em;
-            color: var(--color-primary);
-            margin-bottom: 10px;
-            transform: rotate(-10deg);
-        }
-
-        /* Botões */
-        .btn-group {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            width: 90%;
-            max-width: 300px;
-            margin-top: 20px;
-        }
-
-        .btn {
-            background-color: var(--bg-card);
-            color: var(--text-light);
-            border: 2px solid var(--border-color);
-            padding: 15px;
+        .menu-buttons button {
+            background-color: var(--color-primary);
+            color: var(--color-text);
+            border: none;
+            padding: 15px 30px;
+            margin: 10px;
             border-radius: 10px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+            box-shadow: 0 4px 10px var(--shadow-color);
+            width: 250px;
+        }
+
+        .menu-buttons button:hover {
+            background-color: var(--color-primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px var(--shadow-color);
+        }
+
+        /* =========================================================
+           CONFIGURAÇÕES (SETTINGS) E RANKING
+           ========================================================= */
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--color-text-secondary);
+        }
+        
+        .setting-item label {
+            font-size: 1.1em;
+        }
+
+        .ranking-list, .help-content, .about-content {
+            margin-top: 20px;
+            text-align: left;
+        }
+        
+        .ranking-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dotted var(--color-text-secondary);
+        }
+
+        .back-button {
+            background-color: var(--color-accent);
+            color: var(--bg-body);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 20px;
+            align-self: flex-start;
+        }
+
+        /* =========================================================
+           TELA DE JOGO (GAME SCREEN)
+           ========================================================= */
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 15px;
             font-size: 1.1em;
             font-weight: bold;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            text-transform: uppercase;
-        }
-
-        .btn:hover {
-            background-color: var(--color-primary);
-            box-shadow: var(--shadow-primary);
-            transform: translateY(-2px);
-            border-color: var(--color-primary);
-        }
-        
-        .btn-secondary {
-            background-color: transparent;
-            border: 2px solid var(--text-subtle);
-            color: var(--text-dark);
-        }
-
-        .btn-secondary:hover {
-            background-color: var(--text-subtle);
-            color: var(--text-light);
-            box-shadow: none;
-            transform: none;
-        }
-        
-        .btn-back {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            width: 40px;
-            height: 40px;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2em;
-            z-index: 10;
-        }
-
-        /*
-         ====================
-         GAME SCREEN
-         ====================
-        */
-        .game-screen {
-            padding: 0;
-            justify-content: space-between;
-        }
-
-        .game-info {
-            display: flex;
-            justify-content: space-around;
-            width: 100%;
-            padding: 10px 5px;
-            background-color: var(--bg-screen);
-            border-bottom: 1px solid var(--border-color);
-            font-size: 0.9em;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-
-        .game-info span {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: var(--text-dark);
-            font-weight: bold;
-        }
-
-        .game-info strong {
-            color: var(--text-light);
-            font-size: 1.2em;
-            margin-top: 2px;
         }
 
         #gameCanvas {
             border: 5px solid var(--color-primary);
             background-color: var(--bg-screen);
-            box-shadow: 0 0 20px rgba(88, 101, 242, 0.3);
-            margin: 10px 0;
-            /* Garante que o canvas seja centralizado na área do jogo */
-            align-self: center; 
+            box-shadow: 0 0 20px var(--shadow-color);
+            border-radius: 8px;
         }
 
-        /*
-         ====================
-         DPAD CONTROLES (TOQUE)
-         ====================
-        */
-        .controls-overlay {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 15px 0 20px 0;
-            position: relative;
-        }
-
-        .dpad-container {
-            /* Ponto de transformação para escala e translação */
-            transform-origin: center center; 
-            /* Estilos padrão serão sobrescritos pelas configurações salvas */
-            transform: scale(1) translate(0%, 0%); 
-            opacity: 1;
-            transition: transform 0.2s, opacity 0.2s;
-        }
-        
-        .dpad {
-            display: grid;
-            grid-template-areas:
-                ". up ."
-                "left center right"
-                ". down .";
-            grid-template-columns: 1fr 1fr 1fr;
-            grid-template-rows: 1fr 1fr 1fr;
-            width: 250px;
-            height: 250px;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-
-        .dpad-btn {
-            background-color: var(--color-primary);
+        .game-controls button {
+            background-color: var(--color-accent);
+            color: var(--bg-body);
             border: none;
-            border-radius: 10px;
-            color: var(--text-light);
-            font-size: 1.5em;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            padding: 10px 20px;
+            margin-top: 15px;
+            margin-right: 10px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.1s;
+            font-size: 1em;
+            box-shadow: 0 3px 8px var(--shadow-color);
         }
 
-        .dpad-btn:active {
-            background-color: var(--color-secondary);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-            transform: translateY(2px);
-        }
+        /* =========================================================
+           TEMA SWITCH 
+           ========================================================= */
 
-        .dpad-btn.up { grid-area: up; }
-        .dpad-btn.down { grid-area: down; }
-        .dpad-btn.left { grid-area: left; }
-        .dpad-btn.right { grid-area: right; }
-        
-        .game-actions {
-            display: flex;
-            width: 90%;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 10px;
+        .theme-toggle-wrapper {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
         }
         
-        .game-actions button {
-            flex: 1;
-            padding: 10px 5px;
-            font-size: 0.9em;
-        }
-
-
-        /*
-         ====================
-         CONFIGURAÇÕES E RANKING
-         ====================
-        */
-        .setting-item, .ranking-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            padding: 10px 0;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--text-light);
-        }
-        
-        .setting-item:last-child {
-            border-bottom: none;
-        }
-
-        .setting-label {
-            font-weight: bold;
-            flex: 1;
-            padding-right: 15px;
-            color: var(--text-dark);
-        }
-        
-        .setting-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .slider-value {
-            min-width: 80px;
-            text-align: right;
-            color: var(--color-secondary);
-            font-weight: bold;
-        }
-
-        /* Input Range (Slider) */
-        input[type=range] {
-            -webkit-appearance: none;
-            width: 150px;
-            height: 8px;
-            background: var(--bg-card);
-            border-radius: 4px;
-            outline: none;
-        }
-
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: var(--color-primary);
-            cursor: pointer;
-            box-shadow: 0 0 5px rgba(88, 101, 242, 0.7);
-        }
-        
-        /* Select/Dropdown */
-        select {
-            padding: 8px;
-            border-radius: 5px;
-            border: 1px solid var(--border-color);
-            background-color: var(--bg-card);
-            color: var(--text-light);
-            appearance: none;
-            cursor: pointer;
-        }
-        
-        /* Tema Switch */
-        .switch-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .switch {
+        .theme-toggle {
+            --toggle-size: 1.5em;
             position: relative;
             display: inline-block;
-            width: 50px;
-            height: 25px;
+            width: calc(var(--toggle-size) * 2);
+            height: var(--toggle-size);
         }
-
-        .switch input {
+        
+        .theme-toggle input {
             opacity: 0;
             width: 0;
             height: 0;
         }
-
-        .slider-round {
+        
+        .slider {
             position: absolute;
             cursor: pointer;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: var(--text-subtle);
+            background-color: #ccc;
             transition: 0.4s;
-            border-radius: 25px;
+            border-radius: var(--toggle-size);
         }
-
-        .slider-round:before {
+        
+        .slider:before {
             position: absolute;
             content: "";
-            height: 19px;
-            width: 19px;
-            left: 3px;
-            bottom: 3px;
+            height: calc(var(--toggle-size) * 0.8);
+            width: calc(var(--toggle-size) * 0.8);
+            left: calc(var(--toggle-size) * 0.1);
+            bottom: calc(var(--toggle-size) * 0.1);
             background-color: white;
             transition: 0.4s;
             border-radius: 50%;
         }
-
-        input:checked + .slider-round {
+        
+        input:checked + .slider {
             background-color: var(--color-primary);
         }
-
-        input:checked + .slider-round:before {
-            transform: translateX(25px);
+        
+        input:focus + .slider {
+            box-shadow: 0 0 1px var(--color-primary);
         }
         
-        /* Ranking List */
-        .ranking-list {
-            list-style: none;
+        input:checked + .slider:before {
+            transform: translateX(var(--toggle-size));
+        }
+
+        .slider-icons {
+            position: absolute;
             width: 100%;
-            max-width: 350px;
-            margin: 20px 0;
-            background-color: var(--bg-card);
-            padding: 15px;
-            border-radius: 10px;
-        }
-        
-        .ranking-item {
-            padding: 10px;
-            margin: 5px 0;
-            border-bottom: 1px dashed var(--border-color);
-            background-color: var(--bg-card);
-            border-radius: 5px;
-            transition: all 0.2s;
-        }
-        
-        .ranking-item.gold {
-            background: linear-gradient(90deg, #FFD70030, transparent);
-            border-color: #FFD700;
-        }
-        .ranking-item.silver {
-            background: linear-gradient(90deg, #C0C0C030, transparent);
-            border-color: #C0C0C0;
-        }
-        .ranking-item.bronze {
-            background: linear-gradient(90deg, #CD7F3230, transparent);
-            border-color: #CD7F32;
+            height: 100%;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 4px;
+            pointer-events: none;
+            color: white;
         }
 
-        /*
-         ====================
-         AJUDA/SOBRE
-         ====================
-        */
-        .content-box {
-            background-color: var(--bg-card);
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-            width: 90%;
-            max-width: 400px;
-            text-align: left;
-        }
-        
-        .content-box h3 {
-            color: var(--color-secondary);
-            margin-top: 15px;
-            margin-bottom: 5px;
-        }
-        
-        .content-box p, .content-box ul {
-            color: var(--text-dark);
-            font-size: 0.9em;
-            line-height: 1.4;
-        }
-        
-        .content-box ul {
-            list-style: none;
-            padding-left: 0;
-        }
-        
-        .content-box li {
-            margin-bottom: 5px;
-        }
+        .slider-icons .fa-moon { color: var(--color-text); }
+        .slider-icons .fa-sun { color: gold; }
 
-        /*
-         ====================
-         ANIMAÇÃO BOLINHAS CAINDO (confetti)
-         ====================
-        */
+        /* =========================================================
+           EFEITO DE BOLINHAS CAINDO (Confetes)
+           ========================================================= */
         .bolinha {
             position: fixed;
-            width: 15px;
-            height: 15px;
-            background-color: red;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
+            bottom: -50px;
             opacity: 0;
-            top: 0;
-            z-index: 1000;
-            pointer-events: none;
-            animation: cair 1.5s ease-in forwards;
+            z-index: 9999;
+            animation: fallAndFade 0.8s ease-out forwards;
         }
 
-        @keyframes cair {
+        @keyframes fallAndFade {
             0% {
-                transform: translateY(-5vh) rotate(0deg) scale(0);
-                opacity: 1;
-            }
-            50% {
+                transform: translateY(0) rotate(0deg);
                 opacity: 1;
             }
             100% {
-                transform: translateY(105vh) rotate(720deg) scale(1);
+                transform: translateY(-100vh) rotate(720deg);
                 opacity: 0;
             }
-        }
-        
-        .developer-badge {
-            position: absolute;
-            top: 0;
-            right: 0;
-            background-color: var(--color-accent);
-            color: white;
-            padding: 5px 10px;
-            border-bottom-left-radius: 10px;
-            font-size: 0.8em;
-            font-weight: bold;
-            display: none; /* Escondido por padrão */
-        }
-        
-        /* Ajuste de estilo para botões de controle de ajuste (settings) */
-        .adjust-btn {
-            padding: 5px 10px;
-            font-size: 1em;
-            line-height: 1;
-            border-radius: 5px;
-            background-color: var(--color-secondary);
-            color: var(--bg-dark);
-            border: none;
-            cursor: pointer;
-        }
-        
-        .adjust-btn:hover {
-            background-color: var(--color-secondary);
-            opacity: 0.8;
-            transform: scale(1.05);
         }
 
     </style>
 </head>
 <body>
 
-<div class="screen-container">
-
-    <div id="developerBadge" class="developer-badge">DEV MODE</div>
-    
-    <div id="menuScreen" class="menu-screen" style="display: flex;">
-        <i class="fas fa-snake logo"></i>
-        <h1>SNAKE GAME</h1>
-        <h2>Super-web842 Edition</h2>
-        
-        <div class="btn-group">
-            <button class="btn" id="btnStartGame"><i class="fas fa-play"></i> Jogar</button>
-            <button class="btn" id="btnShowRanking"><i class="fas fa-trophy"></i> Ranking</button>
-            <button class="btn" id="btnShowSettings"><i class="fas fa-cogs"></i> Configurações</button>
-            <button class="btn-secondary" id="btnShowHelp"><i class="fas fa-question-circle"></i> Ajuda</button>
-            <button class="btn-secondary" id="btnShowAbout"><i class="fas fa-info-circle"></i> Sobre</button>
-            
-            <div class="switch-container" style="align-self: flex-start; margin-top: 20px;">
-                <span style="color: var(--text-dark);">Modo Escuro / Claro</span>
-                <label class="switch">
-                    <input type="checkbox" id="themeSwitch">
-                    <span class="slider-round"></span>
-                </label>
-            </div>
-        </div>
+    <div class="theme-toggle-wrapper">
+        <label class="theme-toggle">
+            <input type="checkbox" id="themeSwitch">
+            <span class="slider">
+                 <div class="slider-icons">
+                    <i class="fas fa-moon"></i>
+                    <i class="fas fa-sun"></i>
+                </div>
+            </span>
+        </label>
     </div>
 
-    <div id="gameScreen" class="game-screen" style="display: none;">
+    <div class="screen-container">
         
-        <div class="game-info">
-            <span>Pontuação: <strong><span id="score">0</span></strong></span>
-            <span>Recorde: <strong><span id="highScore">0</span></strong></span>
-            <span>Velocidade: <strong><span id="speed">10.0x</span></strong></span>
-        </div>
-        
-        <canvas id="gameCanvas" width="400" height="400"></canvas>
-        
-        <div class="game-actions">
-            <button class="btn-secondary" id="btnBackGame"><i class="fas fa-undo"></i> Menu</button>
-            <button class="btn" id="pauseBtn"><i class="fas fa-pause"></i> PAUSAR</button>
-            <button class="btn-secondary" id="resetBtn"><i class="fas fa-sync-alt"></i> REINICIAR</button>
-        </div>
-
-        <div class="controls-overlay">
-            <div class="dpad-container">
-                <div class="dpad">
-                    <button class="dpad-btn up" onclick="handleTouchControls('up')"><i class="fas fa-arrow-up"></i></button>
-                    <button class="dpad-btn left" onclick="handleTouchControls('left')"><i class="fas fa-arrow-left"></i></button>
-                    <div class="dpad-center"></div>
-                    <button class="dpad-btn right" onclick="handleTouchControls('right')"><i class="fas fa-arrow-right"></i></button>
-                    <button class="dpad-btn down" onclick="handleTouchControls('down')"><i class="fas fa-arrow-down"></i></button>
-                </div>
+        <div class="menu-screen" id="menuScreen" style="display: flex;">
+            <h1>SNAKE GAME</h1>
+            
+            <div class="menu-buttons">
+                <button id="btnStartGame"><i class="fas fa-play"></i> INICIAR JOGO</button>
+                <button id="btnShowSettings"><i class="fas fa-cog"></i> CONFIGURAÇÕES</button>
+                <button id="btnShowRanking"><i class="fas fa-trophy"></i> RANKING</button>
+                <button id="btnShowHelp"><i class="fas fa-question-circle"></i> AJUDA</button>
+                <button id="btnShowAbout"><i class="fas fa-info-circle"></i> SOBRE</button>
             </div>
         </div>
-    </div>
-    
-    <div id="settingsScreen" class="settings-screen" style="display: none;">
-        <button class="btn btn-back" id="btnBackSettings"><i class="fas fa-arrow-left"></i></button>
-        <h1>Configurações</h1>
-        <h2>Personalize sua experiência</h2>
-        
-        <div style="width: 90%; max-width: 400px;">
+
+        <div class="game-screen" id="gameScreen">
+            <div class="game-header">
+                <div>SCORE: <span id="score">0</span></div>
+                <div>HIGHSCORE: <span id="highScore">0</span></div>
+                <div>VELOCIDADE: <span id="speed">10.0x</span></div>
+            </div>
             
-            <h3>Configurações de Jogo</h3>
+            <canvas id="gameCanvas" width="400" height="400"></canvas>
+            
+            <div class="game-controls">
+                <button id="pauseBtn"><i class="fas fa-pause"></i> PAUSAR</button>
+                <button id="resetBtn"><i class="fas fa-redo"></i> RESETAR</button>
+                <button id="btnBackGame"><i class="fas fa-arrow-left"></i> VOLTAR AO MENU</button>
+            </div>
+        </div>
+        
+        <div class="settings-screen" id="settingsScreen">
+            <h2><i class="fas fa-cog"></i> Configurações</h2>
+            
             <div class="setting-item">
-                <span class="setting-label">Velocidade:</span>
-                <div class="setting-controls">
-                    <input type="range" id="speedSlider" min="50" max="200" step="25" value="100">
-                    <span class="slider-value" id="speedValue">Normal</span>
-                </div>
+                <label for="speedSlider">Velocidade do Jogo (ms)</label>
+                <input type="range" id="speedSlider" min="50" max="300" step="10">
+                <span id="speedValue">100ms</span>
             </div>
             
             <div class="setting-item">
-                <span class="setting-label">Tamanho do Campo:</span>
-                <div class="setting-controls">
-                    <select id="fieldSize">
-                        <option value="400">Normal (400px)</option>
-                        <option value="500">Grande (500px)</option>
-                        <option value="300">Pequeno (300px)</option>
-                    </select>
-                </div>
+                <label for="sizeSlider">Tamanho do Campo (px)</label>
+                <input type="range" id="sizeSlider" min="200" max="600" step="40">
+                <span id="sizeValue">400px</span>
             </div>
 
             <div class="setting-item">
-                <span class="setting-label">Cor da Cobra:</span>
-                <div class="setting-controls">
-                    <input type="color" id="snakeColor" value="#5865F2">
-                </div>
+                <label for="snakeColor">Cor da Cobra</label>
+                <input type="color" id="snakeColor" value="#5865F2">
+            </div>
+
+            <button class="back-button" id="btnSaveSettings"><i class="fas fa-save"></i> Salvar e Aplicar</button>
+            <button class="back-button" id="btnBackSettings"><i class="fas fa-arrow-left"></i> Voltar</button>
+        </div>
+        
+        <div class="ranking-screen" id="rankingScreen">
+            <h2><i class="fas fa-trophy"></i> Ranking</h2>
+            
+            <div class="ranking-list" id="rankingList">
+                <p>Nenhum recorde encontrado.</p>
             </div>
             
-            <div class="setting-item">
-                <span class="setting-label">Modo de Jogo:</span>
-                <div class="setting-controls">
-                    <select id="gameMode">
-                        <option value="classic">Clássico (Sem Paredes)</option>
-                        <option value="walls">Com Paredes (Morte)</option>
-                    </select>
-                </div>
-            </div>
-
-            <h3 style="margin-top: 30px;">Controles de Toque (DPAD)</h3>
-            <div class="setting-item">
-                <span class="setting-label">Tamanho dos Controles:</span>
-                <div class="setting-controls">
-                    <button class="adjust-btn" onclick="adjustControl('controlSizeSlider', -5)">-</button>
-                    <input type="range" id="controlSizeSlider" min="50" max="150" step="5" value="100">
-                    <button class="adjust-btn" onclick="adjustControl('controlSizeSlider', 5)">+</button>
-                    <span class="slider-value" id="controlSizeValue">100%</span>
-                </div>
-            </div>
-
-            <div class="setting-item">
-                <span class="setting-label">Posição Horizontal (X):</span>
-                <div class="setting-controls">
-                    <button class="adjust-btn" onclick="adjustControl('controlXSlider', -5)">-</button>
-                    <input type="range" id="controlXSlider" min="-50" max="50" step="5" value="0">
-                    <button class="adjust-btn" onclick="adjustControl('controlXSlider', 5)">+</button>
-                    <span class="slider-value" id="controlXValue">0%</span>
-                </div>
-            </div>
-
-            <div class="setting-item">
-                <span class="setting-label">Posição Vertical (Y):</span>
-                <div class="setting-controls">
-                    <button class="adjust-btn" onclick="adjustControl('controlYSlider', -5)">-</button>
-                    <input type="range" id="controlYSlider" min="-50" max="50" step="5" value="0">
-                    <button class="adjust-btn" onclick="adjustControl('controlYSlider', 5)">+</button>
-                    <span class="slider-value" id="controlYValue">0%</span>
-                </div>
-            </div>
-
-            <div class="setting-item">
-                <span class="setting-label">Transparência (Opacidade):</span>
-                <div class="setting-controls">
-                    <button class="adjust-btn" onclick="adjustControl('controlOpacitySlider', -10)">-</button>
-                    <input type="range" id="controlOpacitySlider" min="10" max="100" step="10" value="100">
-                    <button class="adjust-btn" onclick="adjustControl('controlOpacitySlider', 10)">+</button>
-                    <span class="slider-value" id="controlOpacityValue">100%</span>
-                </div>
-            </div>
-            
+            <button class="back-button" id="btnBackRanking"><i class="fas fa-arrow-left"></i> Voltar</button>
         </div>
 
-        <button class="btn" id="btnSaveSettings" style="margin-top: 40px; width: 90%; max-width: 400px;"><i class="fas fa-save"></i> Salvar Configurações</button>
+        <div class="help-screen" id="helpScreen">
+            <h2><i class="fas fa-question-circle"></i> Ajuda</h2>
+            <div class="help-content">
+                <h3>Controles:</h3>
+                <ul>
+                    <li>**Teclas de Seta (ou W, A, S, D):** Movem a cobra.</li>
+                    <li>**P (ou botão PAUSAR):** Pausa/Despausa o jogo.</li>
+                    <li>**R (ou botão RESETAR):** Reinicia o jogo.</li>
+                </ul>
+                
+                <h3>Pontuação:</h3>
+                <p>Cada fruta normal (maçã, banana, etc.) vale 1 ponto. A fruta de ouro (Gold) vale 5 pontos.</p>
+            </div>
+            <button class="back-button" id="btnBackHelp"><i class="fas fa-arrow-left"></i> Voltar</button>
+        </div>
+
+        <div class="about-screen" id="aboutScreen">
+            <h2><i class="fas fa-info-circle"></i> Sobre</h2>
+            <div class="about-content">
+                <p>Este é um projeto de Snake Game desenvolvido com foco em uma experiência de usuário moderna, utilizando transições CSS e aprimoramentos visuais no Canvas.</p>
+                <p>Desenvolvido para demonstração e aprendizado.</p>
+            </div>
+            <button class="back-button" id="btnBackAbout"><i class="fas fa-arrow-left"></i> Voltar</button>
+        </div>
+
     </div>
 
-    <div id="rankingScreen" class="ranking-screen" style="display: none;">
-        <button class="btn btn-back" id="btnBackRanking"><i class="fas fa-arrow-left"></i></button>
-        <h1>Ranking</h1>
-        <h2>Top 10 Recordes</h2>
+    <script>
+        // =========================================================
+        // FUNÇÕES AUXILIARES, TEMA E EFEITOS
+        // =========================================================
+
+        const themeSwitch = document.getElementById('themeSwitch');
         
-        <ul id="rankingList" class="ranking-list">
-            </ul>
-    </div>
-    
-    <div id="helpScreen" class="help-screen" style="display: none;">
-        <button class="btn btn-back" id="btnBackHelp"><i class="fas fa-arrow-left"></i></button>
-        <h1>Ajuda</h1>
-        <h2>Como Jogar</h2>
-        
-        <div class="content-box">
-            <h3>Objetivo</h3>
-            <p>Controle a cobra para comer as frutas que aparecem no campo. A cada fruta comida, a cobra cresce e sua pontuação aumenta.</p>
-            
-            <h3>Controles</h3>
-            <ul>
-                <li><i class="fas fa-keyboard"></i> **Teclado:** Use as setas (↑ ↓ ← →) ou as teclas WASD para mudar a direção.</li>
-                <li><i class="fas fa-mobile-alt"></i> **Toque/DPAD:** Use os botões direcionais na parte inferior da tela. Você pode personalizar o tamanho e a posição nas Configurações!</li>
-                <li><i class="fas fa-pause"></i> **Pausar:** Use a barra de espaço ou o botão "Pausar" na tela do jogo.</li>
-            </ul>
-            
-            <h3>Regras</h3>
-            <p>O jogo termina se a cobra:</p>
-            <ul>
-                <li><i class="fas fa-times-circle" style="color: var(--color-accent);"></i> Colidir com seu próprio corpo.</li>
-                <li><i class="fas fa-exclamation-triangle" style="color: var(--color-accent);"></i> (No modo **Com Paredes**): Colidir com as bordas do campo.</li>
-            </ul>
-        </div>
-    </div>
-    
-    <div id="aboutScreen" class="about-screen" style="display: none;">
-        <button class="btn btn-back" id="btnBackAbout"><i class="fas fa-arrow-left"></i></button>
-        <h1>Sobre</h1>
-        <h2>Detalhes da Edição Super-web842</h2>
-        
-        <div class="content-box">
-            <p>Esta é uma versão aprimorada do clássico Snake Game, criada como um projeto de desenvolvimento web móvel.</p>
-            
-            <h3>Recursos Especiais</h3>
-            <ul>
-                <li><i class="fas fa-palette"></i> **Temas:** Modo Escuro e Claro com transições suaves.</li>
-                <li><i class="fas fa-cogs"></i> **Configurações:** Personalize a velocidade, tamanho do campo e até mesmo o posicionamento e transparência dos controles de toque.</li>
-                <li><i class="fas fa-apple-alt"></i> **Frutas Detalhadas:** Gráficos de pixel art aprimorados para a comida.</li>
-                <li><i class="fas fa-water"></i> **Animação da Cobra:** Efeito de onda sutil na cobra.</li>
-            </ul>
-            
-            <h3>Tecnologias</h3>
-            <p>Desenvolvido com HTML, CSS e JavaScript puro (Canvas).</p>
-        </div>
-    </div>
-
-</div>
-
-<script>
-    // ====================
-    // FUNÇÃO AUXILIAR PARA CORES E SOMBRAS (CORRIGIDA)
-    // ====================
-    /**
-     * Altera a tonalidade de uma cor hexadecimal (para escurecer ou clarear).
-     */
-    function shadeColor(color, percent) {
-        // Garante que a cor é uma string no formato '#RRGGBB'
-        if (typeof color !== 'string' || color.length !== 7 || color[0] !== '#') {
-            return color; 
-        }
-        
-        let R = parseInt(color.substring(1, 3), 16);
-        let G = parseInt(color.substring(3, 5), 16);
-        let B = parseInt(color.substring(5, 7), 16);
-
-        // Aplica a porcentagem e garante que o valor esteja entre 0 e 255
-        R = Math.min(255, Math.max(0, parseInt(R * (100 + percent) / 100)));
-        G = Math.min(255, Math.max(0, parseInt(G * (100 + percent) / 100)));
-        B = Math.min(255, Math.max(0, parseInt(B * (100 + percent) / 100)));
-
-        // Converte de volta para hexadecimal (garantindo 2 dígitos)
-        let RR = ((R.toString(16).length == 1) ? "0" + R.toString(16) : R.toString(16));
-        let GG = ((G.toString(16).length == 1) ? "0" + G.toString(16) : G.toString(16));
-        let BB = ((B.toString(16).length == 1) ? "0" + B.toString(16) : B.toString(16));
-
-        return "#" + RR + GG + BB;
-    }
-
-
-    // ====================
-    // GERENCIAMENTO DE TEMA (Modo Escuro/Claro)
-    // ====================
-
-    const themeSwitch = document.getElementById('themeSwitch');
-
-    function applyTheme(isLightMode) {
-        if (isLightMode) {
-            document.body.classList.add('light-mode');
-        } else {
-            document.body.classList.remove('light-mode');
-        }
-    }
-
-    function toggleTheme() {
-        const isLightMode = themeSwitch.checked;
-        applyTheme(isLightMode);
-        localStorage.setItem('snakeTheme', isLightMode ? 'light' : 'dark');
-    }
-
-    function loadTheme() {
-        const savedTheme = localStorage.getItem('snakeTheme') || 'dark';
-        const isLightMode = savedTheme === 'light';
-
-        themeSwitch.checked = isLightMode;
-        applyTheme(isLightMode);
-    }
-
-    // ====================
-    // GERENCIAMENTO DE SONS
-    // ====================
-
-    // Funções de som omitidas para simplicidade (use sua própria implementação)
-    function playSound(soundName) {
-        // Implementação de som omitida
-    }
-
-    // ====================
-    // ANIMAÇÕES - BOLINHAS CAINDO (Corrigida a lógica de remoção)
-    // ====================
-
-    function criarBolinhasCaindo(numBolinhas = 15, elementoAlvo = null) {
-        const colors = [
-            getComputedStyle(document.documentElement).getPropertyValue('--color-primary'),
-            getComputedStyle(document.documentElement).getPropertyValue('--color-accent'), 
-            '#4CAF50',
-            '#FF9800',
-            '#9C27B0'
-        ];
-        
-        const parentElement = document.body; // Usa o body como pai
-        
-        for (let i = 0; i < numBolinhas; i++) {
-            setTimeout(() => {
-                const bolinha = document.createElement('div');
-                bolinha.classList.add('bolinha');
-                
-                let left = Math.random() * 100;
-                
-                if (elementoAlvo) {
-                    const rect = elementoAlvo.getBoundingClientRect();
-                    // Calcula a posição horizontal aleatória dentro da largura do elemento (em vw)
-                    const parentWidth = window.innerWidth;
-                    const normalizedLeft = (rect.left / parentWidth) * 100;
-                    const normalizedWidth = (rect.width / parentWidth) * 100;
-                    left = normalizedLeft + (normalizedWidth * Math.random());
-                }
-                
-                bolinha.style.left = left + 'vw';
-                bolinha.style.background = colors[Math.floor(Math.random() * colors.length)];
-                bolinha.style.animationDuration = (0.8 + Math.random() * 0.7) + 's';
-                
-                const tamanho = 10 + Math.random() * 15;
-                bolinha.style.width = tamanho + 'px';
-                bolinha.style.height = tamanho + 'px';
-                
-                parentElement.appendChild(bolinha);
-                
-                // Remove a bolinha após a animação (garante que não haja lixo no DOM)
-                bolinha.addEventListener('animationend', () => {
-                    if (bolinha.parentNode) {
-                        bolinha.parentNode.removeChild(bolinha);
-                    }
-                }, { once: true });
-
-            }, i * 50); // Delay entre cada bolinha
-        }
-    }
-
-
-    // ====================
-    // FUNÇÃO DE TRANSIÇÃO ENTRE TELAS (Principal)
-    // ====================
-
-    function hideAllScreens() {
-        const screens = [
-            'menuScreen', 'gameScreen', 'settingsScreen',
-            'rankingScreen', 'helpScreen', 'aboutScreen'
-        ];
-
-        screens.forEach(screen => {
-            const elemento = document.getElementById(screen);
-            if (elemento) {
-                elemento.style.display = 'none';
-                elemento.classList.remove('tela-saindo', 'tela-entrando');
+        /**
+         * Altera a tonalidade de uma cor hexadecimal.
+         */
+        function shadeColor(color, percent) {
+            if (typeof color !== 'string' || color.length !== 7 || color[0] !== '#') {
+                return color; 
             }
-        });
-    }
-
-    function transicionarTela(telaAtualId, novaTelaId, callback) {
-        const telaAtual = document.getElementById(telaAtualId);
-        const novaTela = document.getElementById(novaTelaId);
-        
-        // 1. Caso de animação de saída:
-        if (telaAtual && telaAtual.style.display !== 'none') {
-            telaAtual.classList.add('tela-saindo');
             
-            // Oculta a tela atual após 300ms (tempo da animação 'slideOut')
-            setTimeout(() => {
+            let R = parseInt(color.substring(1, 3), 16);
+            let G = parseInt(color.substring(3, 5), 16);
+            let B = parseInt(color.substring(5, 7), 16);
+
+            R = Math.min(255, Math.max(0, parseInt(R * (100 + percent) / 100)));
+            G = Math.min(255, Math.max(0, parseInt(G * (100 + percent) / 100)));
+            B = Math.min(255, Math.max(0, parseInt(B * (100 + percent) / 100)));
+
+            let RR = ((R.toString(16).length == 1) ? "0" + R.toString(16) : R.toString(16));
+            let GG = ((G.toString(16).length == 1) ? "0" + G.toString(16) : G.toString(16));
+            let BB = ((B.toString(16).length == 1) ? "0" + B.toString(16) : B.toString(16));
+
+            return "#" + RR + GG + BB;
+        }
+
+        function applyTheme(isLightMode) {
+            if (isLightMode) {
+                document.body.classList.add('light-mode');
+            } else {
+                document.body.classList.remove('light-mode');
+            }
+        }
+
+        function toggleTheme() {
+            const isLightMode = themeSwitch.checked;
+            applyTheme(isLightMode);
+            localStorage.setItem('snakeTheme', isLightMode ? 'light' : 'dark');
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('snakeTheme') || 'dark';
+            const isLightMode = savedTheme === 'light';
+
+            if(themeSwitch) themeSwitch.checked = isLightMode;
+            applyTheme(isLightMode);
+        }
+        
+        function playSound(soundName) {
+            // Implementação de som omitida
+        }
+        
+        /**
+         * Cria e anima bolinhas caindo (efeito confete) em elementos.
+         */
+        function criarBolinhasCaindo(numBolinhas = 15, elementoAlvo = null) {
+            const colors = [
+                getComputedStyle(document.documentElement).getPropertyValue('--color-primary'),
+                getComputedStyle(document.documentElement).getPropertyValue('--color-accent'), 
+                '#4CAF50', '#FF9800', '#9C27B0'
+            ];
+            
+            const parentElement = document.body;
+            
+            for (let i = 0; i < numBolinhas; i++) {
+                setTimeout(() => {
+                    const bolinha = document.createElement('div');
+                    bolinha.classList.add('bolinha');
+                    
+                    let left = Math.random() * 100;
+                    
+                    if (elementoAlvo) {
+                        const rect = elementoAlvo.getBoundingClientRect();
+                        const parentWidth = window.innerWidth;
+                        const normalizedLeft = (rect.left / parentWidth) * 100;
+                        const normalizedWidth = (rect.width / parentWidth) * 100;
+                        left = normalizedLeft + (normalizedWidth * Math.random());
+                    }
+                    
+                    bolinha.style.left = left + 'vw';
+                    bolinha.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    bolinha.style.animationDuration = (0.8 + Math.random() * 0.7) + 's';
+                    
+                    const tamanho = 10 + Math.random() * 15;
+                    bolinha.style.width = tamanho + 'px';
+                    bolinha.style.height = tamanho + 'px';
+                    
+                    parentElement.appendChild(bolinha);
+                    
+                    bolinha.addEventListener('animationend', () => {
+                        if (bolinha.parentNode) {
+                            bolinha.parentNode.removeChild(bolinha);
+                        }
+                    }, { once: true });
+
+                }, i * 50);
+            }
+        }
+
+        function hideAllScreens() {
+            const screens = [
+                'menuScreen', 'gameScreen', 'settingsScreen',
+                'rankingScreen', 'helpScreen', 'aboutScreen'
+            ];
+
+            screens.forEach(screen => {
+                const elemento = document.getElementById(screen);
+                if (elemento) {
+                    elemento.style.display = 'none';
+                    elemento.classList.remove('tela-saindo', 'tela-entrando');
+                }
+            });
+        }
+
+        // =========================================================
+        // FUNÇÃO DE TRANSIÇÃO ENTRE TELAS (CORRIGIDA COM animationend)
+        // =========================================================
+
+        function transicionarTela(telaAtualId, novaTelaId, callback) {
+            const telaAtual = document.getElementById(telaAtualId);
+            const novaTela = document.getElementById(novaTelaId);
+            
+            // 1. Caso de animação de saída:
+            if (telaAtual && telaAtual.style.display !== 'none' && telaAtualId !== novaTelaId) {
+                
+                telaAtual.classList.add('tela-saindo');
+                
+                // Espera a animação de saída terminar
+                const onAnimationEnd = () => {
+                    telaAtual.removeEventListener('animationend', onAnimationEnd);
+                    telaAtual.classList.remove('tela-saindo');
+                    
+                    // Esconde todas as telas e mostra a nova (passo 2)
+                    hideAllScreens();
+                    showNewScreen();
+                };
+                
+                telaAtual.addEventListener('animationend', onAnimationEnd, { once: true });
+                
+            } 
+            // 2. Caso de tela inicial ou transição imediata:
+            else {
                 hideAllScreens();
                 showNewScreen();
-            }, 300); 
-            
-            telaAtual.classList.remove('tela-saindo'); // Remove a classe de animação (já invisível/escondida)
-            
-        } 
-        // 2. Caso de tela inicial ou transição imediata (sem tela anterior visível):
-        else {
-            hideAllScreens();
-            showNewScreen();
-        }
-
-        // Função interna para mostrar a nova tela
-        function showNewScreen() {
-            if (novaTela) {
-                // Usa 'flex' para Game e Menu, 'block' para telas de conteúdo
-                novaTela.style.display = (novaTelaId === 'menuScreen' || novaTelaId === 'gameScreen') ? 'flex' : 'block';
-                novaTela.classList.add('tela-entrando');
-                
-                // Remove a classe após animação de entrada
-                setTimeout(() => {
-                    novaTela.classList.remove('tela-entrando');
-                }, 500);
             }
-            
-            // Executa callback se existir (ex: initGame ou loadSettings)
-            if (callback) callback();
-        }
-    }
 
-
-    // ====================
-    // GERENCIAMENTO DE TELAS 
-    // ====================
-
-    function showMenu() {
-        if (gameLoop) clearInterval(gameLoop);
-        gameRunning = false;
-        
-        // Determina a tela atual (pode ser Game, Settings, etc.)
-        const currentScreen = document.querySelector('.menu-screen[style*="display: flex"], .game-screen[style*="display: flex"], .settings-screen[style*="display: block"], .ranking-screen[style*="display: block"], .help-screen[style*="display: block"], .about-screen[style*="display: block"]');
-        
-        const currentId = currentScreen ? currentScreen.id : 'none';
-
-        transicionarTela(currentId, 'menuScreen');
-    }
-
-    // Funções de navegação simples
-    function startGame() {
-        transicionarTela('menuScreen', 'gameScreen', initGame);
-    }
-    function showSettings() {
-        transicionarTela('menuScreen', 'settingsScreen', loadSettings);
-    }
-    function showRanking() {
-        transicionarTela('menuScreen', 'rankingScreen', loadRanking); 
-    }
-    function showHelp() {
-        transicionarTela('menuScreen', 'helpScreen');
-    }
-    function showAbout() {
-        transicionarTela('menuScreen', 'aboutScreen');
-    }
-
-
-    // ====================
-    // CONFIGURAÇÕES 
-    // ====================
-    
-    function getDefaultSettings() {
-        return {
-            speed: 100,
-            fieldSize: 400,
-            snakeColor: '#5865F2',
-            gameMode: 'classic',
-            controlSize: 100,
-            controlX: 0,
-            controlY: 0,
-            controlOpacity: 100
-        };
-    }
-
-    function loadSettings() {
-        const settings = JSON.parse(localStorage.getItem('snakeSettings')) || getDefaultSettings();
-
-        // Aplica estilos de controle antes de carregar
-        applyControlStyles();
-
-        document.getElementById('speedSlider').value = settings.speed;
-        document.getElementById('fieldSize').value = settings.fieldSize;
-        document.getElementById('snakeColor').value = settings.snakeColor;
-        document.getElementById('gameMode').value = settings.gameMode;
-        updateSpeedValue(settings.speed);
-
-        document.getElementById('controlSizeSlider').value = settings.controlSize;
-        document.getElementById('controlXSlider').value = settings.controlX;
-        document.getElementById('controlYSlider').value = settings.controlY;
-        document.getElementById('controlOpacitySlider').value = settings.controlOpacity;
-
-        updateControlSizeValue(settings.controlSize);
-        updateControlXValue(settings.controlX);
-        updateControlYValue(settings.controlY);
-        updateControlOpacityValue(settings.controlOpacity);
-
-        // Garante que os listeners de input do slider existam apenas uma vez
-        ['speedSlider', 'controlSizeSlider', 'controlXSlider', 'controlYSlider', 'controlOpacitySlider'].forEach(id => {
-            const slider = document.getElementById(id);
-            if (slider && !slider.hasListener) {
-                slider.addEventListener('input', function() {
-                    if (id === 'speedSlider') updateSpeedValue(this.value);
-                    else {
-                         // Atualiza os estilos em tempo real para os controles
-                        const tempSettings = JSON.parse(localStorage.getItem('snakeSettings')) || getDefaultSettings();
-                        if (id === 'controlSizeSlider') tempSettings.controlSize = parseInt(this.value);
-                        if (id === 'controlXSlider') tempSettings.controlX = parseInt(this.value);
-                        if (id === 'controlYSlider') tempSettings.controlY = parseInt(this.value);
-                        if (id === 'controlOpacitySlider') tempSettings.controlOpacity = parseInt(this.value);
-                        
-                        applyControlStyles(tempSettings); // Chama com as configurações TEMPORÁRIAS
-                        
-                        if (id === 'controlSizeSlider') updateControlSizeValue(this.value);
-                        if (id === 'controlXSlider') updateControlXValue(this.value);
-                        if (id === 'controlYSlider') updateControlYValue(this.value);
-                        if (id === 'controlOpacitySlider') updateControlOpacityValue(this.value);
-                    }
-                });
-                slider.hasListener = true;
-            }
-        });
-        
-        // Aplica os estilos iniciais
-        applyControlStyles();
-    }
-
-
-    function adjustControl(sliderId, step) {
-        const slider = document.getElementById(sliderId);
-        if (slider) {
-            let currentValue = parseInt(slider.value);
-            let newValue = currentValue + step;
-
-            newValue = Math.max(slider.min, Math.min(slider.max, newValue));
-
-            slider.value = newValue;
-
-            const event = new Event('input');
-            slider.dispatchEvent(event);
-        }
-    }
-
-
-    // Função para aplicar os estilos do DPAD (usa configurações salvas ou temporárias)
-    function applyControlStyles(settingsOverride = null) {
-        const settings = settingsOverride || JSON.parse(localStorage.getItem('snakeSettings')) || getDefaultSettings();
-        const dpadContainer = document.querySelector('.dpad-container');
-
-        if (dpadContainer) {
-            const scale = settings.controlSize / 100;
-            const translateX = settings.controlX;
-            const translateY = settings.controlY;
-
-            // Usa 'translate3d' para forçar aceleração por hardware (melhor desempenho)
-            dpadContainer.style.transform = `scale(${scale}) translate3d(${translateX}%, ${translateY}%, 0)`;
-            dpadContainer.style.opacity = settings.controlOpacity / 100;
-        }
-    }
-
-    function updateSpeedValue(value) {
-        const speeds = {
-            50: 'Muito Rápido',
-            75: 'Rápido',
-            100: 'Normal',
-            150: 'Lento',
-            200: 'Muito Lento'
-        };
-
-        document.getElementById('speedValue').textContent =
-            speeds[value] || 'Normal';
-    }
-
-    function updateControlSizeValue(value) {
-        document.getElementById('controlSizeValue').textContent = `${value}%`;
-    }
-    function updateControlXValue(value) {
-        document.getElementById('controlXValue').textContent = `${value}% (${value < 0 ? 'Esquerda' : value > 0 ? 'Direita' : 'Centro'})`;
-    }
-    function updateControlYValue(value) {
-        document.getElementById('controlYValue').textContent = `${value}% (${value < 0 ? 'Acima' : value > 0 ? 'Abaixo' : 'Centro'})`;
-    }
-    function updateControlOpacityValue(value) {
-        document.getElementById('controlOpacityValue').textContent = `${value}% (${value == 100 ? 'Opaco' : 'Transparente'})`;
-    }
-
-    function saveSettings() {
-        const settings = {
-            speed: parseInt(document.getElementById('speedSlider').value),
-            fieldSize: parseInt(document.getElementById('fieldSize').value),
-            snakeColor: document.getElementById('snakeColor').value,
-            gameMode: document.getElementById('gameMode').value,
-            controlSize: parseInt(document.getElementById('controlSizeSlider').value),
-            controlX: parseInt(document.getElementById('controlXSlider').value),
-            controlY: parseInt(document.getElementById('controlYSlider').value),
-            controlOpacity: parseInt(document.getElementById('controlOpacitySlider').value)
-        };
-
-        localStorage.setItem('snakeSettings', JSON.stringify(settings));
-        
-        // Aplica os estilos finais
-        applyControlStyles(settings); 
-
-        alert('Configurações salvas! Reinicie o jogo para aplicar a velocidade e o tamanho do campo.');
-        // Após salvar, transiciona de volta para o menu
-        transicionarTela('settingsScreen', 'menuScreen', showMenu);
-    }
-    
-    // ====================
-    // GERENCIAMENTO DE RANKING 
-    // ====================
-
-    function getRanking() {
-        const ranking = localStorage.getItem('snakeRanking');
-        return ranking ? JSON.parse(ranking) : [];
-    }
-
-    function saveRanking(ranking) {
-        localStorage.setItem('snakeRanking', JSON.stringify(ranking));
-    }
-
-    /**
-     * Adiciona ou atualiza a pontuação de um jogador.
-     */
-    function updateRanking(name, score) {
-        let ranking = getRanking();
-
-        const existingPlayerIndex = ranking.findIndex(player => player.name.toUpperCase() === name.toUpperCase());
-
-        if (existingPlayerIndex !== -1) {
-            if (score > ranking[existingPlayerIndex].score) {
-                ranking[existingPlayerIndex].score = score;
-            }
-        } else {
-            ranking.push({ name: name, score: score });
-        }
-
-        ranking.sort((a, b) => b.score - a.score);
-
-        saveRanking(ranking.slice(0, 10)); // Limita aos 10 melhores
-    }
-
-    function loadRanking() {
-        const rankingList = document.getElementById('rankingList');
-        const ranking = getRanking();
-        
-        rankingList.innerHTML = ''; 
-
-        if (ranking.length === 0) {
-            rankingList.innerHTML = '<li style="text-align: center; color: var(--text-subtle);">Nenhum recorde registrado ainda.</li>';
-            return;
-        }
-
-        ranking.forEach((player, index) => {
-            const listItem = document.createElement('li');
-            
-            let rankClass = '';
-            if (index === 0) rankClass = 'gold';
-            else if (index === 1) rankClass = 'silver';
-            else if (index === 2) rankClass = 'bronze';
-            
-            listItem.className = `ranking-item ${rankClass}`;
-            
-            let icon = '';
-            if (index === 0) icon = '<i class="fas fa-crown"></i>';
-            else if (index === 1) icon = '<i class="fas fa-medal"></i>';
-            else if (index === 2) icon = '<i class="fas fa-medal" style="color: #CD7F32;"></i>'; 
-            else icon = `${index + 1}.`;
-
-            listItem.innerHTML = `
-                <div style="font-weight: bold; width: 40px; text-align: left;">${icon}</div>
-                <div style="flex-grow: 1;">${player.name}</div>
-                <div style="font-weight: bold; color: var(--color-primary);">${player.score} pts</div>
-            `;
-
-            rankingList.appendChild(listItem);
-        });
-    }
-
-
-    // ====================
-    // JOGO (Snake) 
-    // ====================
-
-    let canvas, ctx;
-    let snake = [];
-    let food = {};
-    let direction = 'right';
-    let nextDirection = 'right';
-    let score = 0;
-    let highScore = 0;
-    let gameSpeed = 100;
-    let gameRunning = true;
-    let gameLoop;
-    let gameTick = 0; 
-    
-    // TIPOS DE FRUTAS 
-    const FRUIT_TYPES = ['apple', 'watermelon', 'banana', 'orange', 'cherry', 'pineapple', 'grape', 'lemon', 'strawberry']; 
-
-    function initGame() {
-        const settings = JSON.parse(localStorage.getItem('snakeSettings')) || getDefaultSettings();
-
-        // Garante que o canvas está configurado corretamente
-        canvas = document.getElementById('gameCanvas');
-        canvas.width = settings.fieldSize;
-        canvas.height = settings.fieldSize;
-        ctx = canvas.getContext('2d');
-
-        // Inicialização do jogo
-        snake = [{ x: 10, y: 10 }];
-        direction = 'right';
-        nextDirection = 'right';
-        score = 0;
-        gameSpeed = settings.speed;
-        gameRunning = true;
-        gameTick = 0;
-
-        // Info Score
-        highScore = localStorage.getItem('snakeHighScore') || 0;
-        document.getElementById('highScore').textContent = highScore;
-        document.getElementById('score').textContent = score;
-        document.getElementById('speed').textContent = (1000 / gameSpeed).toFixed(1) + 'x';
-        
-        // Define o botão de pausa
-        document.getElementById('pauseBtn').innerHTML = '<i class="fas fa-pause"></i> PAUSAR';
-
-        generateFood();
-        draw();
-
-        if (gameLoop) clearInterval(gameLoop);
-        gameLoop = setInterval(update, gameSpeed);
-
-        document.removeEventListener('keydown', handleKeyPress);
-        document.addEventListener('keydown', handleKeyPress);
-        
-        applyControlStyles(settings);
-    }
-    
-    // Função para gerar a comida
-    function generateFood() {
-        const gridSize = 20;
-        const max = canvas.width / gridSize;
-        
-        const isSpecial = Math.random() > 0.8;
-        
-        food = {
-            x: Math.floor(Math.random() * max),
-            y: Math.floor(Math.random() * max),
-            type: isSpecial ? 'special' : 'normal',
-            fruitType: isSpecial ? 'gold' : FRUIT_TYPES[Math.floor(Math.random() * FRUIT_TYPES.length)]
-        };
-    }
-
-    // Função principal de desenho (com frutas e cobra corrigidas)
-    function draw() {
-        // 1. Desenha o fundo
-        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg-screen');
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        const baseColor = document.getElementById('snakeColor').value || '#5865F2';
-        const darkColor = shadeColor(baseColor, -20);
-        const segmentSize = 20;
-        
-        // VARIÁVEIS PARA ONDA
-        const amplitude = 1.5; 
-        const frequency = 0.5;
-        const speed = 0.2;
-        
-        // Função auxiliar para desenhar retângulo arredondado
-        const drawRoundedRect = (color, rectX, rectY, width, height, r) => {
-            ctx.fillStyle = color;
-            ctx.beginPath();
-            ctx.moveTo(rectX + r, rectY);
-            ctx.lineTo(rectX + width - r, rectY);
-            ctx.arcTo(rectX + width, rectY, rectX + width, rectY + r, r);
-            ctx.lineTo(rectX + width, rectY + height - r);
-            ctx.arcTo(rectX + width, rectY + height, rectX + width - r, rectX + height, r);
-            ctx.lineTo(rectX + r, rectY + height);
-            ctx.arcTo(rectX, rectY + height, rectX, rectY + height - r, r);
-            ctx.lineTo(rectX, rectY + r);
-            ctx.arcTo(rectX, rectY, rectX + r, rectY, r);
-            ctx.closePath();
-            ctx.fill();
-        };
-
-        // --- Desenho da Cobra Arredondada e com Efeito de Onda ---
-        snake.forEach((segment, index) => {
-            const x = segment.x * segmentSize;
-            let y = segment.y * segmentSize;
-            const radius = 3; 
-            
-            // CALCULA O DESLOCAMENTO VERTICAL (APENAS PARA O CORPO)
-            let offsetY = 0;
-            if (index > 0) {
-                const angle = gameTick * speed + index * frequency;
-                offsetY = amplitude * Math.sin(angle);
-                y += offsetY; 
-            }
-            
-            // Corpo
-            if (index > 0) {
-                drawRoundedRect(darkColor, x, y, segmentSize, segmentSize, radius);
-                drawRoundedRect(baseColor, x + 2, y + 2, segmentSize - 4, segmentSize - 4, radius);
-            } 
-            // Cabeça 
-            else {
-                // Desenha a cabeça ligeiramente maior para destaque
-                ctx.fillStyle = baseColor;
-                ctx.fillRect(x - 1, y - 1, segmentSize + 2, segmentSize + 2); // Borda
-                ctx.fillStyle = darkColor;
-                ctx.fillRect(x, y, segmentSize, segmentSize); // Cor Principal
-                
-                // Olhos (mantidos para distinguir a direção)
-                ctx.fillStyle = 'black';
-                const eyeSize = 2;
-                if (direction === 'right') {
-                    ctx.fillRect(x + 13, y + 3, eyeSize, eyeSize);
-                    ctx.fillRect(x + 13, y + 13, eyeSize, eyeSize);
-                } else if (direction === 'left') {
-                    ctx.fillRect(x + 5, y + 3, eyeSize, eyeSize);
-                    ctx.fillRect(x + 5, y + 13, eyeSize, eyeSize);
-                } else if (direction === 'up') {
-                    ctx.fillRect(x + 3, y + 5, eyeSize, eyeSize);
-                    ctx.fillRect(x + 15, y + 5, eyeSize, eyeSize);
-                } else if (direction === 'down') {
-                    ctx.fillRect(x + 3, y + 15, eyeSize, eyeSize);
-                    ctx.fillRect(x + 15, y + 15, eyeSize, eyeSize);
-                }
-            }
-        });
-
-        // --- Desenho das Frutas com Formato Real (CORRIGIDO) ---
-        const foodX = food.x * segmentSize + segmentSize / 2;
-        const foodY = food.y * segmentSize + segmentSize / 2;
-        const radiusFood = 8;
-        let finalColor, darkOutlineColor;
-
-        // 1. Define as cores baseadas no tipo de fruta
-        switch (food.fruitType) {
-            case 'apple':
-            case 'orange':
-                finalColor = food.fruitType === 'apple' ? '#FF3B30' : '#FF9800';
-                darkOutlineColor = shadeColor(finalColor, -25);
-                break;
-            case 'banana':
-                finalColor = '#FFD930';
-                darkOutlineColor = shadeColor(finalColor, -25);
-                break;
-            case 'grape':
-                finalColor = '#9C27B0';
-                darkOutlineColor = shadeColor(finalColor, -25);
-                break;
-            case 'watermelon':
-                finalColor = '#50C878'; 
-                darkOutlineColor = '#3A9655'; 
-                break;
-            case 'cherry':
-                finalColor = '#DC143C'; 
-                darkOutlineColor = shadeColor(finalColor, -25);
-                break;
-            case 'pineapple':
-                finalColor = '#FFC300';
-                darkOutlineColor = '#FFA500'; 
-                break;
-            case 'lemon':
-                finalColor = '#FFEA00';
-                darkOutlineColor = shadeColor(finalColor, -25);
-                break;
-            case 'strawberry':
-                finalColor = '#FF4500'; 
-                darkOutlineColor = shadeColor(finalColor, -25);
-                break;
-            case 'gold':
-                finalColor = '#FFD700';
-                darkOutlineColor = '#C0A000';
-                break;
-            default:
-                finalColor = '#FF5252';
-                darkOutlineColor = shadeColor(finalColor, -25);
-        }
-
-        // 2. Cria o Gradiente (efeito 3D)
-        const gradient = ctx.createRadialGradient(
-            foodX - 2, foodY - 2, 1, 
-            foodX, foodY, radiusFood
-        );
-        gradient.addColorStop(0, shadeColor(finalColor, food.fruitType === 'gold' ? 30 : 20));
-        gradient.addColorStop(1, finalColor);
-
-        // Configurações base
-        ctx.strokeStyle = darkOutlineColor;
-        ctx.lineWidth = 1.5;
-
-        // 3. Desenha a FRUTA ESPECÍFICA
-        ctx.beginPath();
-        
-        switch (food.fruitType) {
-            case 'banana':
-                ctx.fillStyle = gradient;
-                // Simula o formato de banana (mais fino e curvado)
-                ctx.moveTo(foodX - 8, foodY - 8);
-                ctx.bezierCurveTo(foodX - 10, foodY - 15, foodX + 10, foodY - 15, foodX + 8, foodY - 8);
-                ctx.lineTo(foodX + 5, foodY + 8);
-                ctx.bezierCurveTo(foodX + 5, foodY + 15, foodX - 5, foodY + 15, foodX - 8, foodY + 8);
-                ctx.closePath();
-                ctx.fill();
-                ctx.stroke();
-                break;
-            
-            case 'watermelon':
-                // Cor externa escura
-                ctx.fillStyle = darkOutlineColor; 
-                ctx.arc(foodX, foodY + 2, radiusFood, Math.PI, 0); // Meia lua
-                ctx.closePath();
-                ctx.fill();
-                
-                // Miolo vermelho (interior) com gradiente
-                const redGradient = ctx.createRadialGradient(
-                    foodX - 1, foodY + 1, 1, 
-                    foodX, foodY + 2, radiusFood - 3
-                );
-                redGradient.addColorStop(0, '#FF4500');
-                redGradient.addColorStop(1, '#DC143C');
-                
-                ctx.fillStyle = redGradient;
-                ctx.beginPath();
-                ctx.arc(foodX, foodY + 2, radiusFood - 3, Math.PI, 0);
-                ctx.closePath();
-                ctx.fill();
-                
-                // Borda e sementes
-                ctx.strokeStyle = darkOutlineColor;
-                ctx.lineWidth = 1.5;
-                ctx.beginPath();
-                ctx.arc(foodX, foodY + 2, radiusFood, Math.PI, 0);
-                ctx.stroke();
-                
-                ctx.fillStyle = 'black';
-                ctx.fillRect(foodX - 4, foodY - 1, 1, 1);
-                ctx.fillRect(foodX + 3, foodY - 1, 1, 1);
-                ctx.fillRect(foodX - 0.5, foodY - 3, 1, 1);
-                break;
-
-            case 'cherry':
-                ctx.fillStyle = finalColor;
-                const cherryRadius = 4;
-                
-                ctx.beginPath();
-                ctx.arc(foodX - 4, foodY + 2, cherryRadius, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.stroke();
-                
-                ctx.beginPath();
-                ctx.arc(foodX + 4, foodY + 2, cherryRadius, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.stroke();
-                
-                // Cabinho (Talo)
-                ctx.strokeStyle = '#3A9655'; // Verde
-                ctx.lineWidth = 1.5;
-                ctx.beginPath();
-                ctx.moveTo(foodX - 4, foodY + 2 - cherryRadius);
-                ctx.lineTo(foodX - 8, foodY - 8);
-                ctx.lineTo(foodX + 8, foodY - 8);
-                ctx.lineTo(foodX + 4, foodY + 2 - cherryRadius);
-                ctx.stroke();
-                break;
-
-            case 'pineapple':
-                ctx.fillStyle = gradient;
-                // Formato de oval ligeiramente pontudo
-                ctx.ellipse(foodX, foodY + 3, radiusFood - 1, radiusFood + 3, 0, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.stroke();
-                
-                // Coroa verde
-                ctx.fillStyle = '#4CAF50';
-                ctx.fillRect(foodX - 3, foodY - 10, 6, 8);
-                
-                // Adiciona textura (linhas horizontais escuras)
-                ctx.strokeStyle = darkOutlineColor;
-                ctx.lineWidth = 0.5;
-                ctx.beginPath();
-                ctx.moveTo(foodX - 6, foodY + 1);
-                ctx.lineTo(foodX + 6, foodY + 1);
-                ctx.moveTo(foodX - 6, foodY + 5);
-                ctx.lineTo(foodX + 6, foodY + 5);
-                ctx.stroke();
-                break;
-
-            case 'strawberry':
-                ctx.fillStyle = gradient;
-                // Formato de triângulo arredondado (coração)
-                ctx.moveTo(foodX, foodY - radiusFood); 
-                ctx.lineTo(foodX + radiusFood, foodY + radiusFood / 2);
-                ctx.lineTo(foodX, foodY + radiusFood); 
-                ctx.lineTo(foodX - radiusFood, foodY + radiusFood / 2);
-                ctx.closePath();
-                ctx.fill();
-                ctx.stroke();
-                
-                // Folhas verdes
-                ctx.fillStyle = '#4CAF50';
-                ctx.fillRect(foodX - 5, foodY - 9, 10, 4);
-                
-                // Sementes amarelas
-                ctx.fillStyle = '#FFEB3B';
-                ctx.fillRect(foodX - 4, foodY + 0, 1, 1);
-                ctx.fillRect(foodX + 3, foodY + 2, 1, 1);
-                ctx.fillRect(foodX, foodY + 4, 1, 1);
-                break;
-            
-            case 'grape':
-                // Desenha várias bolinhas roxas
-                ctx.fillStyle = finalColor;
-                const grapeRadius = 2.5;
-                const cluster = [
-                    {x: -2, y: -7}, {x: 2, y: -7},
-                    {x: -4, y: -4}, {x: 0, y: -4}, {x: 4, y: -4},
-                    {x: -2, y: -1}, {x: 2, y: -1},
-                    {x: -4, y: 2}, {x: 0, y: 2}, {x: 4, y: 2}
-                ];
-                
-                cluster.forEach(p => {
-                    ctx.beginPath();
-                    ctx.arc(foodX + p.x, foodY + p.y, grapeRadius, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.strokeStyle = darkOutlineColor;
-                    ctx.stroke();
-                });
-
-                // Talo
-                ctx.strokeStyle = '#5A4A3A'; 
-                ctx.lineWidth = 1;
-                ctx.beginPath();
-                ctx.moveTo(foodX, foodY - 8);
-                ctx.lineTo(foodX, foodY - 12);
-                ctx.stroke();
-                break;
-
-            default:
-                // Desenho Padrão (Apple, Orange, Lemon, Gold)
-                ctx.fillStyle = gradient;
-                ctx.arc(foodX, foodY, radiusFood, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.stroke();
-
-                // Talo e folha
-                if (food.fruitType !== 'gold') {
-                    ctx.strokeStyle = '#5A4A3A'; // Marrom
-                    ctx.lineWidth = 1;
-                    ctx.beginPath();
-                    ctx.moveTo(foodX, foodY - radiusFood);
-                    ctx.lineTo(foodX + 2, foodY - radiusFood - 3);
-                    ctx.stroke(); 
+            // Função interna para mostrar a nova tela
+            function showNewScreen() {
+                if (novaTela) {
+                    novaTela.style.display = (novaTelaId === 'menuScreen' || novaTelaId === 'gameScreen') ? 'flex' : 'block';
+                    novaTela.classList.add('tela-entrando');
+                    
+                    setTimeout(() => {
+                        novaTela.classList.remove('tela-entrando');
+                    }, 500);
                 }
                 
-                if (food.fruitType === 'lemon') {
-                    ctx.fillStyle = '#4CAF50';
-                    ctx.beginPath();
-                    ctx.ellipse(foodX + 4, foodY - radiusFood - 4, 3, 2, 10 * Math.PI / 180, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-                
-                ctx.strokeStyle = darkOutlineColor; 
-                ctx.lineWidth = 1.5;
-                break;
+                if (callback) callback();
+            }
         }
 
-        // 4. Adiciona um pequeno brilho branco no canto 
-        if (food.fruitType !== 'watermelon' && food.fruitType !== 'cherry' && food.fruitType !== 'grape' && food.fruitType !== 'pineapple') {
-             ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-             ctx.beginPath();
-             ctx.arc(foodX - 3, foodY - 3, 1.5, 0, Math.PI * 2);
-             ctx.fill();
+        // =========================================================
+        // SISTEMA DE IMAGENS PARA FRUTAS (Assets)
+        // =========================================================
+
+        // Tipos de frutas (devem corresponder aos nomes dos arquivos)
+        const FRUIT_TYPES = ['apple', 'watermelon', 'banana', 'orange', 'cherry', 'pineapple', 'grape', 'lemon', 'strawberry']; 
+
+        const fruitImages = {
+            apple: new Image(),
+            banana: new Image(),
+            orange: new Image(),
+            watermelon: new Image(),
+            cherry: new Image(),
+            pineapple: new Image(),
+            grape: new Image(),
+            lemon: new Image(),
+            strawberry: new Image(),
+            gold: new Image() // Fruta especial
+        };
+
+        // USANDO CAMINHOS RELATIVOS (ESPERA-SE QUE A PASTA 'images' EXISTA)
+        const fruitImagePaths = {
+            apple: 'images/apple.png',
+            banana: 'images/banana.png',
+            orange: 'images/orange.png',
+            watermelon: 'images/watermelon.png',
+            cherry: 'images/cherry.png',
+            pineapple: 'images/pineapple.png',
+            grape: 'images/grape.png',
+            lemon: 'images/lemon.png',
+            strawberry: 'images/strawberry.png',
+            gold: 'images/gold.png'
+        };
+
+        // Carregar todas as imagens
+        Object.keys(fruitImages).forEach(fruit => {
+            fruitImages[fruit].src = fruitImagePaths[fruit];
+            fruitImages[fruit].onerror = function() {
+                console.error(`Falha ao carregar imagem: ${fruitImages[fruit].src}. Usando fallback.`);
+            };
+        });
+
+        // =========================================================
+        // CONFIGURAÇÕES E RANKING
+        // =========================================================
+        
+        function getDefaultSettings() {
+            return {
+                speed: 100,
+                fieldSize: 400,
+                snakeColor: '#5865F2'
+            };
         }
-    }
 
+        function loadSettings() {
+            const settings = JSON.parse(localStorage.getItem('snakeSettings')) || getDefaultSettings();
 
-    function update() {
-        if (!gameRunning) return;
-
-        direction = nextDirection;
-        const head = { ...snake[0] };
-
-        switch (direction) {
-            case 'up': head.y--; break;
-            case 'down': head.y++; break;
-            case 'left': head.x--; break;
-            case 'right': head.x++; break;
+            document.getElementById('speedSlider').value = settings.speed;
+            document.getElementById('speedValue').textContent = settings.speed + 'ms';
+            
+            document.getElementById('sizeSlider').value = settings.fieldSize;
+            document.getElementById('sizeValue').textContent = settings.fieldSize + 'px';
+            
+            document.getElementById('snakeColor').value = settings.snakeColor;
+            
+            document.getElementById('speedSlider').oninput = function() {
+                document.getElementById('speedValue').textContent = this.value + 'ms';
+            };
+            
+            document.getElementById('sizeSlider').oninput = function() {
+                document.getElementById('sizeValue').textContent = this.value + 'px';
+            };
         }
 
-        const max = canvas.width / 20;
-        const settings = JSON.parse(localStorage.getItem('snakeSettings')) || getDefaultSettings();
+        function saveSettings() {
+            const settings = {
+                speed: parseInt(document.getElementById('speedSlider').value),
+                fieldSize: parseInt(document.getElementById('sizeSlider').value),
+                snakeColor: document.getElementById('snakeColor').value
+            };
+            localStorage.setItem('snakeSettings', JSON.stringify(settings));
+            alert('Configurações salvas! Aplique ao iniciar o próximo jogo.');
+        }
 
-        if (settings.gameMode !== 'walls') {
-            if (head.x < 0) head.x = max - 1;
-            if (head.x >= max) head.x = 0;
-            if (head.y < 0) head.y = max - 1;
-            if (head.y >= max) head.y = 0;
-        } else {
-            if (head.x < 0 || head.x >= max || head.y < 0 || head.y >= max) {
-                gameOver();
+        function updateRanking(newScore) {
+            let ranking = JSON.parse(localStorage.getItem('snakeRanking')) || [];
+            
+            const newRecord = { score: newScore, date: new Date().toLocaleString() };
+            ranking.push(newRecord);
+
+            ranking.sort((a, b) => b.score - a.score);
+            ranking = ranking.slice(0, 10);
+
+            localStorage.setItem('snakeRanking', JSON.stringify(ranking));
+
+            const currentHighScore = parseInt(localStorage.getItem('snakeHighScore') || 0);
+            if (newScore > currentHighScore) {
+                localStorage.setItem('snakeHighScore', newScore);
+                document.getElementById('highScore').textContent = newScore;
+            }
+        }
+
+        function loadRanking() {
+            const rankingListDiv = document.getElementById('rankingList');
+            const ranking = JSON.parse(localStorage.getItem('snakeRanking')) || [];
+            rankingListDiv.innerHTML = '';
+
+            if (ranking.length === 0) {
+                rankingListDiv.innerHTML = '<p>Nenhum recorde ainda. Comece a jogar!</p>';
                 return;
             }
+
+            ranking.forEach((item, index) => {
+                const rankItem = document.createElement('div');
+                rankItem.classList.add('ranking-item');
+                rankItem.innerHTML = `
+                    <span>#${index + 1}</span>
+                    <span>Score: ${item.score}</span>
+                    <span style="font-size: 0.8em; color: var(--color-text-secondary);">${item.date}</span>
+                `;
+                rankingListDiv.appendChild(rankItem);
+            });
         }
+        
+        // =========================================================
+        // JOGO (Snake) - Variáveis e Funções Principais
+        // =========================================================
 
-        for (let i = 1; i < snake.length; i++) {
-            if (head.x === snake[i].x && head.y === snake[i].y) {
-                gameOver();
-                return;
-            }
-        }
+        let canvas, ctx;
+        let snake = [];
+        let food = {};
+        let direction = 'right';
+        let nextDirection = 'right';
+        let score = 0;
+        let highScore = 0;
+        let gameSpeed = 100;
+        let gameRunning = true;
+        let gameLoop;
+        let gameTick = 0; 
 
-        snake.unshift(head);
+        function initGame() {
+            const settings = JSON.parse(localStorage.getItem('snakeSettings')) || getDefaultSettings();
 
-        if (head.x === food.x && head.y === food.y) {
-            playSound('eatFood');
+            canvas = document.getElementById('gameCanvas');
+            canvas.width = settings.fieldSize;
+            canvas.height = settings.fieldSize;
+            ctx = canvas.getContext('2d');
 
-            score += food.type === 'special' ? 5 : 1;
+            snake = [{ x: 10, y: 10 }];
+            direction = 'right';
+            nextDirection = 'right';
+            score = 0;
+            gameSpeed = settings.speed;
+            gameRunning = true;
+            gameTick = 0;
+
+            highScore = localStorage.getItem('snakeHighScore') || 0;
+            document.getElementById('highScore').textContent = highScore;
             document.getElementById('score').textContent = score;
-            generateFood();
-
-            if (score > highScore) {
-                highScore = score;
-                localStorage.setItem('snakeHighScore', highScore);
-                document.getElementById('highScore').textContent = highScore;
-            }
-        } else {
-            snake.pop();
-        }
-
-        gameTick++; 
-
-        draw();
-    }
-
-    function handleKeyPress(e) {
-        if (!gameRunning) return;
-        switch (e.key) {
-            case 'ArrowUp': case 'w': if (direction !== 'down') nextDirection = 'up'; break;
-            case 'ArrowDown': case 's': if (direction !== 'up') nextDirection = 'down'; break;
-            case 'ArrowLeft': case 'a': if (direction !== 'right') nextDirection = 'left'; break;
-            case 'ArrowRight': case 'd': if (direction !== 'left') nextDirection = 'right'; break;
-            case ' ': togglePause(); break;
+            document.getElementById('speed').textContent = (1000 / gameSpeed).toFixed(1) + 'x';
             
-            // Ativação do Modo Desenvolvedor ao pressionar uma combinação de teclas
-            case 'D': // Exemplo: Pressionar Shift+D (ou apenas D se não houver Shift)
-                if(e.shiftKey) checkDeveloperModeCode(); 
-                break;
-        }
-    }
+            document.getElementById('pauseBtn').innerHTML = '<i class="fas fa-pause"></i> PAUSAR';
 
-    function handleTouchControls(touchDirection) {
-        if (!gameRunning) return;
-        switch (touchDirection) {
-            case 'up': if (direction !== 'down') nextDirection = 'up'; break;
-            case 'down': if (direction !== 'up') nextDirection = 'down'; break;
-            case 'left': if (direction !== 'right') nextDirection = 'left'; break;
-            case 'right': if (direction !== 'left') nextDirection = 'right'; break;
-        }
-    }
+            generateFood();
+            draw();
 
-    function togglePause() {
-        gameRunning = !gameRunning;
-        const btn = document.getElementById('pauseBtn');
-        if (gameRunning) {
-            btn.innerHTML = '<i class="fas fa-pause"></i> PAUSAR';
+            if (gameLoop) clearInterval(gameLoop);
             gameLoop = setInterval(update, gameSpeed);
-        } else {
-            btn.innerHTML = '<i class="fas fa-play"></i> RETOMAR';
-            clearInterval(gameLoop);
+
+            document.removeEventListener('keydown', handleKeyPress);
+            document.addEventListener('keydown', handleKeyPress);
         }
-    }
-
-    function resetGame() {
-        clearInterval(gameLoop);
-        initGame();
-    }
-
-    function gameOver() {
-        playSound('gameOver');
-
-        gameRunning = false;
-        clearInterval(gameLoop);
-
-        if (score > 0) {
-            const playerName = prompt(`Game Over! Pontuação: ${score}\n\nParabéns! Digite seu nome (máx. 10 caracteres) para o Ranking:`, "Jogador").substring(0, 10);
-            if (playerName) {
-                updateRanking(playerName, score);
-            }
-        }
-
-        setTimeout(() => {
-            if (confirm(`Game Over! Pontuação: ${score}\n\nJogar novamente?`)) {
-                resetGame();
-            } else {
-                transicionarTela('gameScreen', 'menuScreen', showMenu);
-            }
-        }, 500);
-    }
-    
-    // ====================
-    // MODO DESENVOLVEDOR (Developer Mode)
-    // ====================
-    
-    // VARIÁVEL QUE ARMAZENA O CÓDIGO (COLOQUE AQUI O SEU CÓDIGO SECRETO)
-    const DEVELOPER_CODE = "DEV842"; 
-    let developerModeActive = false;
-    
-    // Função de ativação
-    function checkDeveloperModeCode() {
-        if (developerModeActive) return;
-
-        const code = prompt("Digite o código secreto para ativar o Modo Desenvolvedor:");
         
-        if (code && code.toUpperCase() === DEVELOPER_CODE) {
-            developerModeActive = true;
-            document.getElementById('developerBadge').style.display = 'block';
-            alert("Modo Desenvolvedor ATIVADO!");
+        function generateFood() {
+            const segmentSize = 20;
+            const max = canvas.width / segmentSize;
             
-            // Adiciona cheats (Exemplo)
-            document.addEventListener('keydown', handleDeveloperCheats);
-        } else if (code !== null) {
-            alert("Código incorreto. Tente novamente.");
+            let newFood;
+            
+            do {
+                const isSpecial = Math.random() > 0.8;
+                let chosenFruitType = isSpecial ? 'gold' : FRUIT_TYPES[Math.floor(Math.random() * FRUIT_TYPES.length)];
+                
+                newFood = {
+                    x: Math.floor(Math.random() * max),
+                    y: Math.floor(Math.random() * max),
+                    type: isSpecial ? 'special' : 'normal',
+                    fruitType: chosenFruitType
+                };
+            } while (snake.some(segment => segment.x === newFood.x && segment.y === newFood.y));
+            
+            food = newFood;
         }
-    }
-    
-    // Funções Cheat
-    function handleDeveloperCheats(e) {
-        if (!developerModeActive || !gameRunning) return;
-        
-        // Exemplo: 'G' para Crescer (Grow)
-        if (e.key === 'g' || e.key === 'G') {
-            e.preventDefault();
-            // Adiciona um segmento extra para a cobra crescer
-            snake.unshift({...snake[0]}); 
-            score += 10;
-            document.getElementById('score').textContent = score;
-            alert("CHEAT: Cresceu 10 pontos!");
+
+        function update() {
+            if (!gameRunning) return;
+            
+            gameTick++;
+            direction = nextDirection;
+            
+            const head = { x: snake[0].x, y: snake[0].y };
+            
+            if (direction === 'right') head.x++;
+            else if (direction === 'left') head.x--;
+            else if (direction === 'up') head.y--;
+            else if (direction === 'down') head.y++;
+            
+            const gridSize = 20;
+            const max = canvas.width / gridSize;
+            
+            if (head.x < 0 || head.x >= max || 
+                head.y < 0 || head.y >= max || 
+                snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+                
+                gameOver();
+                return;
+            }
+            
+            snake.unshift(head);
+            
+            if (head.x === food.x && head.y === food.y) {
+                const points = food.type === 'special' ? 5 : 1;
+                score += points;
+                document.getElementById('score').textContent = score;
+                
+                if (score > highScore) {
+                    highScore = score;
+                    document.getElementById('highScore').textContent = highScore;
+                }
+                
+                generateFood();
+                playSound('eat');
+            } else {
+                snake.pop();
+            }
+            
+            draw();
+        }
+
+        function handleKeyPress(e) {
+            if (!gameRunning) {
+                if (e.key === 'p' || e.key === 'P') togglePause();
+                return;
+            }
+            
+            if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+                if (direction !== 'left') nextDirection = 'right';
+            } else if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+                if (direction !== 'right') nextDirection = 'left';
+            } else if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
+                if (direction !== 'down') nextDirection = 'up';
+            } else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
+                if (direction !== 'up') nextDirection = 'down';
+            } else if (e.key === 'p' || e.key === 'P') {
+                togglePause();
+            } else if (e.key === 'r' || e.key === 'R') {
+                resetGame();
+            }
+        }
+
+        function togglePause() {
+            if (gameRunning) {
+                clearInterval(gameLoop);
+                gameRunning = false;
+                document.getElementById('pauseBtn').innerHTML = '<i class="fas fa-play"></i> CONTINUAR';
+            } else {
+                gameLoop = setInterval(update, gameSpeed);
+                gameRunning = true;
+                document.getElementById('pauseBtn').innerHTML = '<i class="fas fa-pause"></i> PAUSAR';
+            }
+        }
+
+        function resetGame() {
+            if (gameLoop) clearInterval(gameLoop);
+            initGame();
         }
         
-        // Exemplo: 'F' para Fruta Instantânea (Find Food)
-        if (e.key === 'f' || e.key === 'F') {
-            e.preventDefault();
-            snake.unshift({...snake[0]});
-            score += food.type === 'special' ? 5 : 1;
-            document.getElementById('score').textContent = score;
-            generateFood();
-            alert("CHEAT: Fruta instantânea comida!");
+        function gameOver() {
+            gameRunning = false;
+            clearInterval(gameLoop);
+            
+            updateRanking(score);
+            
+            document.getElementById('pauseBtn').innerHTML = '<i class="fas fa-gamepad"></i> JOGAR NOVAMENTE';
+            alert(`GAME OVER! Sua pontuação: ${score}`);
         }
-    }
+        
+        /**
+         * Função de desenho principal, incluindo a renderização de imagens das frutas.
+         */
+        function draw() {
+            // 1. Desenha o fundo
+            ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg-screen');
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // ====================
-    // LISTENERS GERAIS (COM A CORREÇÃO DE ANIMAÇÃO)
-    // ====================
+            const baseColor = document.getElementById('snakeColor').value || '#5865F2';
+            const darkColor = shadeColor(baseColor, -20);
+            const segmentSize = 20;
+            
+            const amplitude = 1.5; 
+            const frequency = 0.5;
+            const speed = 0.2;
+            
+            // Função auxiliar para desenhar cantos arredondados
+            const drawRoundedRect = (color, rectX, rectY, width, height, r) => {
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.moveTo(rectX + r, rectY);
+                ctx.lineTo(rectX + width - r, rectY);
+                ctx.arcTo(rectX + width, rectY, rectX + width, rectY + r, r);
+                ctx.lineTo(rectX + width, rectY + height - r);
+                ctx.arcTo(rectX + width, rectY + height, rectX + width - r, rectX + height, r);
+                ctx.lineTo(rectX + r, rectY + height);
+                ctx.arcTo(rectX, rectY + height, rectX, rectY + height - r, r);
+                ctx.lineTo(rectX, rectY + r);
+                ctx.arcTo(rectX, rectY, rectX + r, rectY, r);
+                ctx.closePath();
+                ctx.fill();
+            };
 
-    function setupEventListeners() {
-        document.getElementById('themeSwitch').addEventListener('change', toggleTheme);
-        
-        // --- Botões do Menu (Correção: REMOVIDO o setTimeout de 300ms) ---
-        
-        document.getElementById('btnStartGame').addEventListener('click', function() {
-            criarBolinhasCaindo(20, this);
-            transicionarTela('menuScreen', 'gameScreen', initGame);
-        });
-        
-        document.getElementById('btnShowSettings').addEventListener('click', function() {
-            criarBolinhasCaindo(15, this);
-            transicionarTela('menuScreen', 'settingsScreen', loadSettings);
-        });
-        
-        document.getElementById('btnShowRanking').addEventListener('click', function() {
-            criarBolinhasCaindo(15, this);
-            transicionarTela('menuScreen', 'rankingScreen', loadRanking);
-        });
-        
-        document.getElementById('btnShowHelp').addEventListener('click', function() {
-            criarBolinhasCaindo(15, this);
-            transicionarTela('menuScreen', 'helpScreen');
-        });
-        
-        document.getElementById('btnShowAbout').addEventListener('click', function() {
-            criarBolinhasCaindo(15, this);
-            transicionarTela('menuScreen', 'aboutScreen');
-        });
-        
-        // --- Botões Voltar (Correção: REMOVIDO o setTimeout de 300ms) ---
-        
-        document.getElementById('btnBackGame').addEventListener('click', function() {
-            criarBolinhasCaindo(15, this);
-            transicionarTela('gameScreen', 'menuScreen', showMenu);
-        });
-        
-        document.getElementById('btnBackSettings').addEventListener('click', function() {
-            criarBolinhasCaindo(15, this);
-            transicionarTela('settingsScreen', 'menuScreen', showMenu);
-        });
-        
-        document.getElementById('btnBackRanking').addEventListener('click', function() {
-            criarBolinhasCaindo(15, this);
-            transicionarTela('rankingScreen', 'menuScreen', showMenu);
-        });
-        
-        document.getElementById('btnBackHelp').addEventListener('click', function() {
-            criarBolinhasCaindo(15, this);
-            transicionarTela('helpScreen', 'menuScreen', showMenu);
-        });
-        
-        document.getElementById('btnBackAbout').addEventListener('click', function() {
-            criarBolinhasCaindo(15, this);
-            transicionarTela('aboutScreen', 'menuScreen', showMenu);
-        });
-        
-        // Botões do jogo e salvar configurações
-        document.getElementById('pauseBtn').addEventListener('click', togglePause);
-        document.getElementById('resetBtn').addEventListener('click', resetGame);
-        
-        document.getElementById('btnSaveSettings').addEventListener('click', function() {
-            criarBolinhasCaindo(10, this);
-            saveSettings(); 
-        });
-    }
+            // 2. Desenho da Cobra
+            snake.forEach((segment, index) => {
+                const x = segment.x * segmentSize;
+                let y = segment.y * segmentSize;
+                const radius = 3; 
+                
+                let offsetY = 0;
+                if (index > 0) {
+                    const angle = gameTick * speed + index * frequency;
+                    offsetY = amplitude * Math.sin(angle);
+                    y += offsetY; 
+                }
+                
+                if (index > 0) {
+                    drawRoundedRect(darkColor, x, y, segmentSize, segmentSize, radius);
+                    drawRoundedRect(baseColor, x + 2, y + 2, segmentSize - 4, segmentSize - 4, radius);
+                } 
+                else {
+                    ctx.fillStyle = baseColor;
+                    ctx.fillRect(x - 1, y - 1, segmentSize + 2, segmentSize + 2); 
+                    ctx.fillStyle = darkColor;
+                    ctx.fillRect(x, y, segmentSize, segmentSize); 
+                    
+                    // Olhos
+                    ctx.fillStyle = 'black';
+                    const eyeSize = 2;
+                    if (direction === 'right') {
+                        ctx.fillRect(x + 13, y + 3, eyeSize, eyeSize);
+                        ctx.fillRect(x + 13, y + 13, eyeSize, eyeSize);
+                    } else if (direction === 'left') {
+                        ctx.fillRect(x + 5, y + 3, eyeSize, eyeSize);
+                        ctx.fillRect(x + 5, y + 13, eyeSize, eyeSize);
+                    } else if (direction === 'up') {
+                        ctx.fillRect(x + 3, y + 5, eyeSize, eyeSize);
+                        ctx.fillRect(x + 15, y + 5, eyeSize, eyeSize);
+                    } else if (direction === 'down') {
+                        ctx.fillRect(x + 3, y + 15, eyeSize, eyeSize);
+                        ctx.fillRect(x + 15, y + 15, eyeSize, eyeSize);
+                    }
+                }
+            });
 
-    // Inicialização
-    loadTheme();
-    setupEventListeners();
-    
-    // Garante que a tela inicial seja exibida corretamente
-    hideAllScreens();
-    document.getElementById('menuScreen').style.display = 'flex';
-    
-    // Adiciona listener para a tentativa de Developer Mode
-    document.addEventListener('keydown', handleKeyPress);
-</script>
+            // 3. Desenho das Frutas com IMAGENS
+            const foodX = food.x * segmentSize;
+            const foodY = food.y * segmentSize;
+            const fruitType = food.fruitType;
+            
+            if (fruitImages[fruitType] && fruitImages[fruitType].complete && fruitImages[fruitType].naturalWidth > 0) {
+                const imgSize = segmentSize * 1.2;
+                const offset = (imgSize - segmentSize) / 2;
+                
+                ctx.drawImage(
+                    fruitImages[fruitType],
+                    foodX - offset,
+                    foodY - offset,
+                    imgSize,
+                    imgSize
+                );
+                
+                // Brilho especial para frutas especiais (Ex: gold)
+                if (food.type === 'special') {
+                    ctx.save();
+                    ctx.globalAlpha = 0.3;
+                    ctx.fillStyle = 'rgba(255, 215, 0, 0.5)';
+                    ctx.beginPath();
+                    ctx.arc(foodX + segmentSize/2, foodY + segmentSize/2, segmentSize/2 + 2, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+            } else {
+                // Fallback: desenho geométrico simples
+                const foodCenterX = foodX + segmentSize / 2;
+                const foodCenterY = foodY + segmentSize / 2;
+                const radiusFood = 8;
+                
+                ctx.fillStyle = food.type === 'special' ? 'gold' : 'red';
+                ctx.beginPath();
+                ctx.arc(foodCenterX, foodCenterY, radiusFood, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#800000';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+        }
 
+
+        // =========================================================
+        // LISTENERS GERAIS E INICIALIZAÇÃO
+        // =========================================================
+
+        function setupEventListeners() {
+            if(document.getElementById('themeSwitch')) {
+                document.getElementById('themeSwitch').addEventListener('change', toggleTheme);
+            }
+            
+            // --- Botões do Menu ---
+            document.getElementById('btnStartGame').addEventListener('click', function() {
+                criarBolinhasCaindo(20, this);
+                transicionarTela('menuScreen', 'gameScreen', initGame);
+            });
+            
+            document.getElementById('btnShowSettings').addEventListener('click', function() {
+                criarBolinhasCaindo(15, this);
+                transicionarTela('menuScreen', 'settingsScreen', loadSettings);
+            });
+            
+            document.getElementById('btnShowRanking').addEventListener('click', function() {
+                criarBolinhasCaindo(15, this);
+                transicionarTela('menuScreen', 'rankingScreen', loadRanking);
+            });
+            
+            document.getElementById('btnShowHelp').addEventListener('click', function() {
+                criarBolinhasCaindo(15, this);
+                transicionarTela('menuScreen', 'helpScreen');
+            });
+            
+            document.getElementById('btnShowAbout').addEventListener('click', function() {
+                criarBolinhasCaindo(15, this);
+                transicionarTela('menuScreen', 'aboutScreen');
+            });
+            
+            // --- Botões Voltar ---
+            document.getElementById('btnBackGame').addEventListener('click', function() {
+                criarBolinhasCaindo(15, this);
+                transicionarTela('gameScreen', 'menuScreen', function() {
+                    if (gameLoop) clearInterval(gameLoop);
+                    gameRunning = false;
+                });
+            });
+            
+            document.getElementById('btnBackSettings').addEventListener('click', function() {
+                criarBolinhasCaindo(15, this);
+                transicionarTela('settingsScreen', 'menuScreen');
+            });
+            
+            document.getElementById('btnBackRanking').addEventListener('click', function() {
+                criarBolinhasCaindo(15, this);
+                transicionarTela('rankingScreen', 'menuScreen');
+            });
+            
+            document.getElementById('btnBackHelp').addEventListener('click', function() {
+                criarBolinhasCaindo(15, this);
+                transicionarTela('helpScreen', 'menuScreen');
+            });
+            
+            document.getElementById('btnBackAbout').addEventListener('click', function() {
+                criarBolinhasCaindo(15, this);
+                transicionarTela('aboutScreen', 'menuScreen');
+            });
+            
+            // Botões do jogo e salvar configurações
+            if(document.getElementById('pauseBtn')) document.getElementById('pauseBtn').addEventListener('click', togglePause);
+            if(document.getElementById('resetBtn')) document.getElementById('resetBtn').addEventListener('click', resetGame);
+            
+            if(document.getElementById('btnSaveSettings')) {
+                document.getElementById('btnSaveSettings').addEventListener('click', function() {
+                    criarBolinhasCaindo(10, this);
+                    saveSettings(); 
+                });
+            }
+        }
+
+        // Inicialização ao carregar a página
+        window.onload = function() {
+            loadTheme();
+            setupEventListeners();
+            hideAllScreens();
+            document.getElementById('menuScreen').style.display = 'flex';
+        };
+
+    </script>
 </body>
 </html>
+
