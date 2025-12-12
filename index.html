@@ -12,6 +12,7 @@
             --bg-screen: #1a1a2e;
             --bg-menu-btn: #2a2a3a;
             --color-primary: #5865F2;
+            --color-primary-rgb: 88, 101, 242; /* RGB para efeitos de transparência */
             --color-text: white;
             --color-subtle: #666;
             --color-border: #3a3a4e;
@@ -23,6 +24,7 @@
             --bg-screen: #ffffff;
             --bg-menu-btn: #e0e0e8;
             --color-primary: #4CAF50; /* Verde mais suave para o claro */
+            --color-primary-rgb: 76, 175, 80;
             --color-text: #1a1a2e;
             --color-subtle: #888;
             --color-border: #cccccc;
@@ -242,6 +244,34 @@
             color: var(--color-text);
         }
 
+        .settings-screen h3, .ranking-screen h2, .help-screen h2, .about-screen h2 {
+            color: var(--color-primary);
+            margin-bottom: 20px;
+        }
+
+        .ranking-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        /* RANKING STYLES (Adicionado aqui para funcionar) */
+        .ranking-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--color-border);
+            transition: all 0.2s;
+            font-size: 1.1rem;
+        }
+        .ranking-item:hover {
+            background: rgba(var(--color-primary-rgb), 0.1);
+        }
+        .ranking-item.gold { color: #FFD700; }
+        .ranking-item.silver { color: #C0C0C0; }
+        .ranking-item.bronze { color: #CD7F32; }
+
+
         .setting-option {
             margin-bottom: 15px;
             padding: 10px;
@@ -348,6 +378,64 @@
             }
             .game-screen {
                 padding: 10px 0; 
+            }
+        }
+        
+        /* ==================== */
+        /* ANIMAÇÕES - BOLINHAS */
+        /* ==================== */
+
+        .bolinha {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: var(--color-primary);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.7;
+            animation: bolinha-caindo 1.5s ease-out forwards;
+        }
+
+        @keyframes bolinha-caindo {
+            0% {
+                transform: translateY(-100px) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) scale(0.3);
+                opacity: 0;
+            }
+        }
+
+        /* Efeito de transição entre telas */
+        .tela-saindo {
+            animation: tela-saindo 0.5s ease-out forwards;
+        }
+
+        .tela-entrando {
+            animation: tela-entrando 0.5s ease-out forwards;
+        }
+
+        @keyframes tela-saindo {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+        }
+
+        @keyframes tela-entrando {
+            0% {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
             }
         }
         
@@ -553,7 +641,7 @@
         
         <div class="help-item">
             <strong><i class="fas fa-apple-alt"></i> COMIDAS:</strong>
-            <p style="color: var(--color-subtle);">• Frutas normais (Maçã, Uva, etc.): +1 ponto<br>
+            <p style="color: var(--color-subtle);">• Frutas normais (+1 ponto)<br>
                • Fruta Gold: +5 pontos (dourada e mais rara)</p>
         </div>
         
@@ -579,7 +667,7 @@
         
         <div class="help-item">
             <strong>🎮 SNAKE GAME - GameLink Edition</strong>
-            <p style="color: var(--color-subtle);">Versão: 1.3.0 (Com Movimento Ondulado)</p>
+            <p style="color: var(--color-subtle);">Versão: 1.5.0 (Novas Frutas e Ranking Corrigido)</p>
             <p style="color: var(--color-subtle);">Desenvolvido especialmente para a comunidade gamer</p>
         </div>
         
@@ -661,45 +749,137 @@
         }
 
         // ====================
-        // GERENCIAMENTO DE TELAS
+        // ANIMAÇÕES - BOLINHAS CAINDO
+        // ====================
+
+        function criarBolinhasCaindo(numBolinhas = 15, elementoAlvo = null) {
+            for (let i = 0; i < numBolinhas; i++) {
+                setTimeout(() => {
+                    const bolinha = document.createElement('div');
+                    bolinha.classList.add('bolinha');
+                    
+                    // Define cores aleatórias baseadas no tema
+                    const cores = [
+                        'var(--color-primary)',
+                        '#FF5252', 
+                        '#4CAF50',
+                        '#FF9800',
+                        '#9C27B0'
+                    ];
+                    
+                    // Se houver um elemento alvo, posiciona as bolinhas em relação a ele
+                    let left = Math.random() * 100;
+                    if (elementoAlvo) {
+                        const rect = elementoAlvo.getBoundingClientRect();
+                        // Calcula a posição horizontal aleatória dentro da largura do elemento
+                        left = ((rect.left / window.innerWidth) * 100) + ((rect.width / window.innerWidth) * 100 * Math.random());
+                    }
+                    
+                    bolinha.style.left = left + 'vw';
+                    bolinha.style.background = cores[Math.floor(Math.random() * cores.length)];
+                    bolinha.style.animationDuration = (0.8 + Math.random() * 0.7) + 's';
+                    
+                    // Tamanho aleatório
+                    const tamanho = 10 + Math.random() * 20;
+                    bolinha.style.width = tamanho + 'px';
+                    bolinha.style.height = tamanho + 'px';
+                    
+                    document.body.appendChild(bolinha);
+                    
+                    // Remove a bolinha após a animação
+                    setTimeout(() => {
+                        if (bolinha.parentNode) {
+                            bolinha.parentNode.removeChild(bolinha);
+                        }
+                    }, 1500);
+                }, i * 50); // Delay entre cada bolinha
+            }
+        }
+
+        // ====================
+        // FUNÇÃO DE TRANSIÇÃO ENTRE TELAS
+        // ====================
+
+        function transicionarTela(telaAtualId, novaTelaId, callback) {
+            const telaAtual = document.getElementById(telaAtualId);
+            const novaTela = document.getElementById(novaTelaId);
+            
+            if (telaAtual && telaAtual.style.display !== 'none') {
+                // Se a tela atual estiver visível, aplica a animação de saída
+                telaAtual.classList.add('tela-saindo');
+                
+                setTimeout(() => {
+                    // Esconde todas as telas
+                    hideAllScreens();
+                    
+                    // Mostra a nova tela com animação
+                    if (novaTela) {
+                        novaTela.style.display = (novaTelaId === 'menuScreen' || novaTelaId === 'gameScreen') ? 'flex' : 'block';
+                        novaTela.classList.add('tela-entrando');
+                        
+                        // Remove a classe após animação de entrada
+                        setTimeout(() => {
+                            novaTela.classList.remove('tela-entrando');
+                        }, 500);
+                    }
+                    
+                    // Executa callback se existir
+                    if (callback) callback();
+                    
+                    // Remove a classe da tela antiga
+                    telaAtual.classList.remove('tela-saindo');
+                }, 300); // 300ms de atraso para dar tempo da animação sair
+            } else {
+                // Se não houver tela atual visível, apenas mostra a nova
+                hideAllScreens();
+                if (novaTela) {
+                    novaTela.style.display = (novaTelaId === 'menuScreen' || novaTelaId === 'gameScreen') ? 'flex' : 'block';
+                    novaTela.classList.add('tela-entrando');
+                    
+                    setTimeout(() => {
+                        novaTela.classList.remove('tela-entrando');
+                    }, 500);
+                }
+                
+                if (callback) callback();
+            }
+        }
+
+        // ====================
+        // GERENCIAMENTO DE TELAS 
         // ====================
 
         function showMenu() {
             if (gameLoop) clearInterval(gameLoop);
             gameRunning = false;
+            
+            const currentScreen = document.querySelector('.menu-screen, .game-screen, .settings-screen, .ranking-screen, .help-screen, .about-screen');
+            const currentId = currentScreen && currentScreen.style.display !== 'none' ? currentScreen.id : '';
 
-            hideAllScreens();
-            document.getElementById('menuScreen').style.display = 'flex';
+            transicionarTela(currentId, 'menuScreen');
         }
 
         function startGame() {
-            hideAllScreens();
-            document.getElementById('gameScreen').style.display = 'flex';
-            initGame();
+            transicionarTela('menuScreen', 'gameScreen', initGame);
         }
 
         function showSettings() {
-            hideAllScreens();
-            document.getElementById('settingsScreen').style.display = 'block';
-            loadSettings();
+            transicionarTela('menuScreen', 'settingsScreen', loadSettings);
         }
 
         function showRanking() {
-            hideAllScreens();
-            document.getElementById('rankingScreen').style.display = 'block';
-            // loadRanking (função omitida)
+            transicionarTela('menuScreen', 'rankingScreen', loadRanking); 
         }
 
         function showHelp() {
-            hideAllScreens();
-            document.getElementById('helpScreen').style.display = 'block';
+            transicionarTela('menuScreen', 'helpScreen');
         }
 
         function showAbout() {
-            hideAllScreens();
-            document.getElementById('aboutScreen').style.display = 'block';
+            transicionarTela('menuScreen', 'aboutScreen');
         }
-
+        
+        // FUNÇÃO ATUALIZADA
         function hideAllScreens() {
             const screens = [
                 'menuScreen', 'gameScreen', 'settingsScreen',
@@ -707,14 +887,19 @@
             ];
 
             screens.forEach(screen => {
-                document.getElementById(screen).style.display = 'none';
+                const elemento = document.getElementById(screen);
+                if (elemento) {
+                    elemento.style.display = 'none';
+                    elemento.classList.remove('tela-saindo', 'tela-entrando');
+                }
             });
         }
 
-        // ====================
-        // CONFIGURAÇÕES GERAIS
-        // ====================
 
+        // ====================
+        // CONFIGURAÇÕES 
+        // ====================
+        
         function getDefaultSettings() {
             return {
                 speed: 100,
@@ -730,6 +915,8 @@
 
         function loadSettings() {
             const settings = JSON.parse(localStorage.getItem('snakeSettings')) || getDefaultSettings();
+
+            applyControlStyles();
 
             document.getElementById('speedSlider').value = settings.speed;
             document.getElementById('fieldSize').value = settings.fieldSize;
@@ -747,10 +934,11 @@
             updateControlYValue(settings.controlY);
             updateControlOpacityValue(settings.controlOpacity);
 
-            ['controlSizeSlider', 'controlXSlider', 'controlYSlider', 'controlOpacitySlider'].forEach(id => {
+            ['speedSlider', 'controlSizeSlider', 'controlXSlider', 'controlYSlider', 'controlOpacitySlider'].forEach(id => {
                 const slider = document.getElementById(id);
                 if (slider && !slider.hasListener) {
                     slider.addEventListener('input', function() {
+                        if (id === 'speedSlider') updateSpeedValue(this.value);
                         if (id === 'controlSizeSlider') updateControlSizeValue(this.value);
                         if (id === 'controlXSlider') updateControlXValue(this.value);
                         if (id === 'controlYSlider') updateControlYValue(this.value);
@@ -759,7 +947,9 @@
                     slider.hasListener = true;
                 }
             });
+            applyControlStyles();
         }
+
 
         function adjustControl(sliderId, step) {
             const slider = document.getElementById(sliderId);
@@ -831,11 +1021,91 @@
 
             localStorage.setItem('snakeSettings', JSON.stringify(settings));
             alert('Configurações salvas! Reinicie o jogo para aplicar.');
-            showMenu();
+            // Após salvar, transiciona de volta para o menu
+            transicionarTela('settingsScreen', 'menuScreen', showMenu);
+        }
+        
+        // ====================
+        // GERENCIAMENTO DE RANKING (ATUALIZADO)
+        // ====================
+
+        function getRanking() {
+            const ranking = localStorage.getItem('snakeRanking');
+            return ranking ? JSON.parse(ranking) : [];
         }
 
+        function saveRanking(ranking) {
+            localStorage.setItem('snakeRanking', JSON.stringify(ranking));
+        }
+
+        /**
+         * Adiciona ou atualiza a pontuação de um jogador, garantindo que
+         * apenas o recorde de cada nome seja mantido.
+         */
+        function updateRanking(name, score) {
+            let ranking = getRanking();
+
+            // 1. Encontra se o jogador já existe
+            const existingPlayerIndex = ranking.findIndex(player => player.name.toUpperCase() === name.toUpperCase());
+
+            if (existingPlayerIndex !== -1) {
+                // 2. Se o jogador existe, verifica se a nova pontuação é um recorde
+                if (score > ranking[existingPlayerIndex].score) {
+                    ranking[existingPlayerIndex].score = score; // Atualiza a pontuação
+                }
+            } else {
+                // 3. Se não existe, adiciona o novo jogador
+                ranking.push({ name: name, score: score });
+            }
+
+            // 4. Ordena o ranking (do maior score para o menor)
+            ranking.sort((a, b) => b.score - a.score);
+
+            // 5. Salva o ranking (limitando aos 10 melhores, por exemplo)
+            saveRanking(ranking.slice(0, 10));
+        }
+
+        function loadRanking() {
+            const rankingList = document.getElementById('rankingList');
+            const ranking = getRanking();
+            
+            rankingList.innerHTML = ''; // Limpa a lista atual
+
+            if (ranking.length === 0) {
+                rankingList.innerHTML = '<li style="text-align: center; color: var(--color-subtle);">Nenhum recorde registrado ainda.</li>';
+                return;
+            }
+
+            ranking.forEach((player, index) => {
+                const listItem = document.createElement('li');
+                
+                // Define classes para destaque dos primeiros lugares
+                let rankClass = '';
+                if (index === 0) rankClass = 'gold';
+                else if (index === 1) rankClass = 'silver';
+                else if (index === 2) rankClass = 'bronze';
+                
+                listItem.className = `ranking-item ${rankClass}`;
+                
+                let icon = '';
+                if (index === 0) icon = '<i class="fas fa-crown"></i>';
+                else if (index === 1) icon = '<i class="fas fa-medal"></i>';
+                else if (index === 2) icon = '<i class="fas fa-medal" style="color: #CD7F32;"></i>'; // Bronze
+                else icon = `${index + 1}.`;
+
+                listItem.innerHTML = `
+                    <div style="font-weight: bold; width: 40px; text-align: left;">${icon}</div>
+                    <div style="flex-grow: 1;">${player.name}</div>
+                    <div style="font-weight: bold; color: var(--color-primary);">${player.score} pts</div>
+                `;
+
+                rankingList.appendChild(listItem);
+            });
+        }
+
+
         // ====================
-        // JOGO (Snake)
+        // JOGO (Snake) 
         // ====================
 
         let canvas, ctx;
@@ -848,10 +1118,10 @@
         let gameSpeed = 100;
         let gameRunning = true;
         let gameLoop;
-        let gameTick = 0; // Contador de frames para o efeito de onda
+        let gameTick = 0; 
         
-        // TIPOS DE FRUTAS
-        const FRUIT_TYPES = ['apple', 'banana', 'mango', 'orange', 'grape'];
+        // TIPOS DE FRUTAS (ATUALIZADO com melancia, cereja, abacaxi, limão e morango)
+        const FRUIT_TYPES = ['apple', 'watermelon', 'banana', 'orange', 'cherry', 'pineapple', 'grape', 'lemon', 'strawberry']; 
 
         function initGame() {
             const settings = JSON.parse(localStorage.getItem('snakeSettings')) || getDefaultSettings();
@@ -927,7 +1197,7 @@
                 ctx.lineTo(rectX + width - r, rectY);
                 ctx.arcTo(rectX + width, rectY, rectX + width, rectY + r, r);
                 ctx.lineTo(rectX + width, rectY + height - r);
-                ctx.arcTo(rectX + width, rectY + height, rectX + width - r, rectY + height, r);
+                ctx.arcTo(rectX + width, rectY + height, rectX + width - r, rectX + height, r);
                 ctx.lineTo(rectX + r, rectY + height);
                 ctx.arcTo(rectX, rectY + height, rectX, rectY + height - r, r);
                 ctx.lineTo(rectX, rectY + r);
@@ -989,22 +1259,48 @@
             const foodY = food.y * segmentSize + segmentSize / 2;
             const radiusFood = 8;
             let finalColor, darkOutlineColor;
+            let isRound = true; // A maioria das frutas é redonda
 
             // 1. Define as cores baseadas no tipo de fruta
             switch (food.fruitType) {
                 case 'apple':
                 case 'orange':
-                case 'grape':
-                    finalColor = food.fruitType === 'apple' ? '#FF3B30' : food.fruitType === 'orange' ? '#FF9800' : '#9E5C9A';
+                    finalColor = food.fruitType === 'apple' ? '#FF3B30' : '#FF9800';
                     darkOutlineColor = shadeColor(finalColor, -25);
                     break;
                 case 'banana':
                     finalColor = '#FFD930';
                     darkOutlineColor = shadeColor(finalColor, -25);
+                    isRound = false; // Formato curvado
                     break;
-                case 'mango':
-                    finalColor = '#FF9500';
+                case 'grape':
+                    finalColor = '#9C27B0';
                     darkOutlineColor = shadeColor(finalColor, -25);
+                    isRound = false; // Formato de cacho
+                    break;
+                case 'watermelon':
+                    finalColor = '#50C878'; // Verde melancia
+                    darkOutlineColor = '#3A9655'; // Borda escura
+                    isRound = false; // Formato de meia lua
+                    break;
+                case 'cherry':
+                    finalColor = '#DC143C'; // Vermelho cereja
+                    darkOutlineColor = shadeColor(finalColor, -25);
+                    isRound = false; // Formato de cacho
+                    break;
+                case 'pineapple':
+                    finalColor = '#FFC300'; // Amarelo abacaxi
+                    darkOutlineColor = '#FFA500'; // Laranja para textura
+                    isRound = false; // Formato de abacaxi
+                    break;
+                case 'lemon':
+                    finalColor = '#FFEA00'; // Amarelo limão
+                    darkOutlineColor = shadeColor(finalColor, -25);
+                    break;
+                case 'strawberry':
+                    finalColor = '#FF4500'; // Vermelho morango
+                    darkOutlineColor = shadeColor(finalColor, -25);
+                    isRound = false; // Formato de morango
                     break;
                 case 'gold':
                     finalColor = '#FFD700';
@@ -1020,7 +1316,7 @@
                 foodX - 2, foodY - 2, 1, 
                 foodX, foodY, radiusFood
             );
-            gradient.addColorStop(0, shadeColor(finalColor, food.fruitType === 'gold' ? 30 : 20));
+            gradient.addColorStop(0, shadeColor(finalColor, food.type === 'special' ? 30 : 20));
             gradient.addColorStop(1, finalColor);
 
             // 3. Desenha a FRUTA ESPECÍFICA
@@ -1030,36 +1326,154 @@
 
             ctx.beginPath();
             
-            if (food.fruitType === 'banana') {
-                // Simula o formato de banana (retângulo curvado)
-                ctx.moveTo(foodX - 8, foodY - 8);
-                ctx.bezierCurveTo(foodX - 10, foodY - 15, foodX + 10, foodY - 15, foodX + 8, foodY - 8);
-                ctx.lineTo(foodX + 5, foodY + 8);
-                ctx.bezierCurveTo(foodX + 5, foodY + 15, foodX - 5, foodY + 15, foodX - 8, foodY + 8);
-                ctx.closePath();
-            } else {
-                // Desenho padrão para Maçã/Uva/Laranja/Gold (Circular com um pequeno talo)
-                ctx.arc(foodX, foodY, radiusFood, 0, Math.PI * 2);
+            // --- Desenhos customizados por tipo ---
+            switch (food.fruitType) {
+                case 'banana':
+                    // Simula o formato de banana (retângulo curvado)
+                    ctx.moveTo(foodX - 8, foodY - 8);
+                    ctx.bezierCurveTo(foodX - 10, foodY - 15, foodX + 10, foodY - 15, foodX + 8, foodY - 8);
+                    ctx.lineTo(foodX + 5, foodY + 8);
+                    ctx.bezierCurveTo(foodX + 5, foodY + 15, foodX - 5, foodY + 15, foodX - 8, foodY + 8);
+                    ctx.closePath();
+                    // Sem talo
+                    break;
                 
-                // Adiciona um pequeno talo
-                ctx.moveTo(foodX, foodY - radiusFood);
-                ctx.lineTo(foodX + 2, foodY - radiusFood - 3);
-                ctx.strokeStyle = '#5A4A3A'; // Marrom
-                ctx.lineWidth = 1;
-                ctx.stroke(); 
+                case 'watermelon':
+                    // Formato de fatia
+                    ctx.arc(foodX, foodY, radiusFood, Math.PI, 0); // Meia lua
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+                    // Miolo vermelho (interior)
+                    ctx.fillStyle = shadeColor('#FF3B30', 20); // Vermelho mais claro
+                    ctx.beginPath();
+                    ctx.arc(foodX, foodY, radiusFood - 3, Math.PI, 0);
+                    ctx.closePath();
+                    ctx.fill();
+                    // Sementes pretas
+                    ctx.fillStyle = 'black';
+                    ctx.fillRect(foodX - 4, foodY - 3, 1, 1);
+                    ctx.fillRect(foodX + 3, foodY - 3, 1, 1);
+                    ctx.fillRect(foodX - 0.5, foodY - 5, 1, 1);
+                    break;
+
+                case 'cherry':
+                    // Desenha duas cerejas
+                    ctx.arc(foodX - 4, foodY + 2, radiusFood / 2, 0, Math.PI * 2);
+                    ctx.moveTo(foodX + 6, foodY + 2);
+                    ctx.arc(foodX + 4, foodY + 2, radiusFood / 2, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                    // Desenha o cabinho (Talo)
+                    ctx.strokeStyle = '#3A9655'; // Verde
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.moveTo(foodX - 4, foodY + 2 - radiusFood / 2);
+                    ctx.lineTo(foodX - 8, foodY - 8);
+                    ctx.lineTo(foodX + 8, foodY - 8);
+                    ctx.lineTo(foodX + 4, foodY + 2 - radiusFood / 2);
+                    ctx.stroke();
+                    break;
+
+                case 'pineapple':
+                    // Formato de oval ligeiramente pontudo
+                    ctx.ellipse(foodX, foodY + 3, radiusFood - 1, radiusFood + 3, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                    // Coroa verde
+                    ctx.fillStyle = '#4CAF50';
+                    ctx.fillRect(foodX - 3, foodY - 10, 6, 8);
+                    // Adiciona textura (linhas horizontais escuras)
+                    ctx.strokeStyle = darkOutlineColor;
+                    ctx.lineWidth = 0.5;
+                    ctx.beginPath();
+                    ctx.moveTo(foodX - 6, foodY + 1);
+                    ctx.lineTo(foodX + 6, foodY + 1);
+                    ctx.moveTo(foodX - 6, foodY + 5);
+                    ctx.lineTo(foodX + 6, foodY + 5);
+                    ctx.stroke();
+                    break;
+
+                case 'strawberry':
+                    // Formato de triângulo arredondado (coração)
+                    ctx.moveTo(foodX, foodY - radiusFood); // Topo
+                    ctx.lineTo(foodX + radiusFood, foodY + radiusFood / 2);
+                    ctx.lineTo(foodX, foodY + radiusFood); // Base
+                    ctx.lineTo(foodX - radiusFood, foodY + radiusFood / 2);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+                    // Folhas verdes
+                    ctx.fillStyle = '#4CAF50';
+                    ctx.fillRect(foodX - 5, foodY - 9, 10, 4);
+                    // Sementes amarelas
+                    ctx.fillStyle = '#FFEB3B';
+                    ctx.fillRect(foodX - 4, foodY + 0, 1, 1);
+                    ctx.fillRect(foodX + 3, foodY + 2, 1, 1);
+                    break;
                 
-                ctx.strokeStyle = darkOutlineColor; // Volta a cor da borda
-                ctx.lineWidth = 1.5;
+                case 'grape':
+                    // Desenha várias bolinhas roxas
+                    ctx.fillStyle = finalColor;
+                    const grapeRadius = 2.5;
+                    const cluster = [
+                        {x: -2, y: -7}, {x: 2, y: -7},
+                        {x: -4, y: -4}, {x: 0, y: -4}, {x: 4, y: -4},
+                        {x: -2, y: -1}, {x: 2, y: -1},
+                        {x: -4, y: 2}, {x: 0, y: 2}, {x: 4, y: 2}
+                    ];
+                    
+                    cluster.forEach(p => {
+                        ctx.beginPath();
+                        ctx.arc(foodX + p.x, foodY + p.y, grapeRadius, 0, Math.PI * 2);
+                        ctx.fill();
+                    });
+
+                    // Talo
+                    ctx.strokeStyle = '#5A4A3A'; 
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(foodX, foodY - 8);
+                    ctx.lineTo(foodX, foodY - 12);
+                    ctx.stroke();
+                    break;
+
+                default:
+                    // Desenho Padrão (Apple, Orange, Lemon, Gold)
+                    ctx.arc(foodX, foodY, radiusFood, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // Adiciona um pequeno talo
+                    if (food.fruitType !== 'gold') {
+                        ctx.strokeStyle = '#5A4A3A'; // Marrom
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(foodX, foodY - radiusFood);
+                        ctx.lineTo(foodX + 2, foodY - radiusFood - 3);
+                        ctx.stroke(); 
+                    }
+                    
+                    // Se for limão, adicione a folha
+                    if (food.fruitType === 'lemon') {
+                        ctx.fillStyle = '#4CAF50';
+                        ctx.beginPath();
+                        ctx.ellipse(foodX + 4, foodY - radiusFood - 4, 3, 2, 10 * Math.PI / 180, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    
+                    ctx.strokeStyle = darkOutlineColor; 
+                    ctx.lineWidth = 1.5;
+                    break;
             }
 
-            ctx.fill();
-            ctx.stroke(); // Desenha a borda para dar definição
-
-            // 4. Adiciona um pequeno brilho branco no canto
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-            ctx.beginPath();
-            ctx.arc(foodX - 3, foodY - 3, 1.5, 0, Math.PI * 2);
-            ctx.fill();
+            // 4. Adiciona um pequeno brilho branco no canto (Apenas para redondos)
+            if (food.fruitType !== 'watermelon' && food.fruitType !== 'cherry' && food.fruitType !== 'pineapple' && food.fruitType !== 'grape' && food.fruitType !== 'strawberry') {
+                 ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                 ctx.beginPath();
+                 ctx.arc(foodX - 3, foodY - 3, 1.5, 0, Math.PI * 2);
+                 ctx.fill();
+            }
         }
 
 
@@ -1166,44 +1580,121 @@
             gameRunning = false;
             clearInterval(gameLoop);
 
+            // Se a pontuação for maior que zero, solicita o nome e atualiza o ranking
             if (score > 0) {
-                // Adicionar ao Ranking (função não implementada, mas mantida)
+                const playerName = prompt(`Game Over! Pontuação: ${score}\n\nParabéns! Digite seu nome (máx. 10 caracteres) para o Ranking:`, "Jogador").substring(0, 10);
+                if (playerName) {
+                    updateRanking(playerName, score); // CHAMA A FUNÇÃO DE ATUALIZAÇÃO
+                }
             }
 
             setTimeout(() => {
                 if (confirm(`Game Over! Pontuação: ${score}\n\nJogar novamente?`)) {
                     resetGame();
                 } else {
-                    showMenu();
+                    // Retorna ao menu principal com animação
+                    transicionarTela('gameScreen', 'menuScreen', showMenu);
                 }
             }, 500);
         }
 
         // ====================
-        // LISTENERS GERAIS
+        // LISTENERS GERAIS 
         // ====================
 
         function setupEventListeners() {
             document.getElementById('themeSwitch').addEventListener('change', toggleTheme);
-            document.getElementById('btnStartGame').addEventListener('click', startGame);
-            document.getElementById('btnShowSettings').addEventListener('click', showSettings);
-            document.getElementById('btnShowRanking').addEventListener('click', showRanking);
-            document.getElementById('btnShowHelp').addEventListener('click', showHelp);
-            document.getElementById('btnShowAbout').addEventListener('click', showAbout);
-            document.getElementById('btnBackGame').addEventListener('click', showMenu);
-            document.getElementById('btnBackSettings').addEventListener('click', showMenu);
-            document.getElementById('btnBackRanking').addEventListener('click', showMenu);
-            document.getElementById('btnBackHelp').addEventListener('click', showMenu);
-            document.getElementById('btnBackAbout').addEventListener('click', showMenu);
+            
+            // Botões do Menu com animações
+            document.getElementById('btnStartGame').addEventListener('click', function() {
+                criarBolinhasCaindo(20, this);
+                setTimeout(() => {
+                    transicionarTela('menuScreen', 'gameScreen', initGame);
+                }, 300);
+            });
+            
+            document.getElementById('btnShowSettings').addEventListener('click', function() {
+                criarBolinhasCaindo(15, this);
+                setTimeout(() => {
+                    transicionarTela('menuScreen', 'settingsScreen', loadSettings);
+                }, 300);
+            });
+            
+            document.getElementById('btnShowRanking').addEventListener('click', function() {
+                criarBolinhasCaindo(15, this);
+                setTimeout(() => {
+                    transicionarTela('menuScreen', 'rankingScreen', loadRanking);
+                }, 300);
+            });
+            
+            document.getElementById('btnShowHelp').addEventListener('click', function() {
+                criarBolinhasCaindo(15, this);
+                setTimeout(() => {
+                    transicionarTela('menuScreen', 'helpScreen');
+                }, 300);
+            });
+            
+            document.getElementById('btnShowAbout').addEventListener('click', function() {
+                criarBolinhasCaindo(15, this);
+                setTimeout(() => {
+                    transicionarTela('menuScreen', 'aboutScreen');
+                }, 300);
+            });
+            
+            // Botões Voltar com animações
+            document.getElementById('btnBackGame').addEventListener('click', function() {
+                criarBolinhasCaindo(15, this);
+                setTimeout(() => {
+                    transicionarTela('gameScreen', 'menuScreen', showMenu);
+                }, 300);
+            });
+            
+            document.getElementById('btnBackSettings').addEventListener('click', function() {
+                criarBolinhasCaindo(15, this);
+                setTimeout(() => {
+                    transicionarTela('settingsScreen', 'menuScreen', showMenu);
+                }, 300);
+            });
+            
+            document.getElementById('btnBackRanking').addEventListener('click', function() {
+                criarBolinhasCaindo(15, this);
+                setTimeout(() => {
+                    transicionarTela('rankingScreen', 'menuScreen', showMenu);
+                }, 300);
+            });
+            
+            document.getElementById('btnBackHelp').addEventListener('click', function() {
+                criarBolinhasCaindo(15, this);
+                setTimeout(() => {
+                    transicionarTela('helpScreen', 'menuScreen', showMenu);
+                }, 300);
+            });
+            
+            document.getElementById('btnBackAbout').addEventListener('click', function() {
+                criarBolinhasCaindo(15, this);
+                setTimeout(() => {
+                    transicionarTela('aboutScreen', 'menuScreen', showMenu);
+                }, 300);
+            });
+            
+            // Botões do jogo
             document.getElementById('pauseBtn').addEventListener('click', togglePause);
             document.getElementById('resetBtn').addEventListener('click', resetGame);
-            document.getElementById('btnSaveSettings').addEventListener('click', saveSettings);
+            document.getElementById('btnSaveSettings').addEventListener('click', function() {
+                criarBolinhasCaindo(10, this);
+                // A função saveSettings agora faz a transição de volta para o menu
+                setTimeout(() => {
+                    saveSettings(); 
+                }, 200);
+            });
         }
 
         // Inicialização
         loadTheme();
         setupEventListeners();
-        showMenu();
+        // Garante que a tela inicial seja exibida sem animação de saída na primeira carga
+        hideAllScreens();
+        document.getElementById('menuScreen').style.display = 'flex';
     </script>
 </body>
 </html>
