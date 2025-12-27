@@ -2,262 +2,742 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game Aprimorado</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FitTrack Pro - Seu App de Treinos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* =========================================================
-           ESTILOS CSS GERAIS E TEMA
-           ========================================================= */
-
+        /* ===== RESET E VARIÁVEIS ===== */
         :root {
-            /* Tema Escuro (Padrão) */
-            --color-primary: #5865F2; /* Azul Discord/Slack */
-            --color-primary-hover: #4752C4;
-            --color-accent: #1ED760; /* Verde Spotify */
-            --color-text: #F6F6F6;
-            --color-text-secondary: #AAAAAA;
-            --bg-body: #1E1E2E; /* Dark background */
-            --bg-container: #2D2D3D; /* Slightly lighter container */
-            --bg-screen: #202225; /* Tela de jogo / Menu */
-            --shadow-color: rgba(0, 0, 0, 0.4);
-        }
-
-        .light-mode {
-            /* Tema Claro */
-            --color-primary: #007bff;
-            --color-primary-hover: #0056b3;
-            --color-accent: #28a745;
-            --color-text: #333333;
-            --color-text-secondary: #666666;
-            --bg-body: #F0F2F5;
-            --bg-container: #FFFFFF;
-            --bg-screen: #E0E2E5;
-            --shadow-color: rgba(0, 0, 0, 0.15);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
-        }
-
-        body {
-            background-color: var(--bg-body);
-            color: var(--color-text);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow: hidden;
-            flex-direction: column;
-        }
-
-        /* =========================================================
-           CONTAINERS DE TELA E ANIMAÇÕES
-           ========================================================= */
-
-        .screen-container {
-            width: 90%;
-            max-width: 800px;
-            height: 90vh;
-            max-height: 900px;
-            background-color: var(--bg-container);
-            border-radius: 15px;
-            box-shadow: 0 10px 30px var(--shadow-color);
-            padding: 20px;
-            position: relative;
-            overflow: hidden;
-            display: none; /* Escondido por padrão */
-        }
-
-        .menu-screen, .game-screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            padding: 20px;
-            background-color: var(--bg-screen);
-            border-radius: 15px;
-        }
-
-        .settings-screen, .ranking-screen, .help-screen, .about-screen {
-            height: 100%;
-            overflow-y: auto;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            padding: 20px;
-            background-color: var(--bg-screen);
-            border-radius: 15px;
-        }
-
-        /* Classes de Animação */
-
-        /* ------------------ Transição de Saída (Slide Out) ------------------ */
-        .tela-saindo {
-            animation: slideOutLeft 0.3s ease-in-out forwards;
-        }
-
-        @keyframes slideOutLeft {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(-100%);
-                opacity: 0;
-            }
-        }
-
-        /* ------------------ Transição de Entrada (Slide In) ------------------ */
-        .tela-entrando {
-            animation: slideInRight 0.3s ease-in-out forwards;
+            --primary-purple: #8a2be2;
+            --primary-purple-dark: #6a1cb0;
+            --primary-purple-light: #a85ef2;
+            --primary-green: #00cc66;
+            --primary-green-dark: #00a352;
+            --primary-green-light: #33ff99;
+            --primary-blue: #3399ff;
+            --primary-blue-dark: #0077e6;
+            --primary-blue-light: #66b3ff;
+            --primary-red: #ff4757;
+            --primary-red-dark: #ff3838;
+            --primary-orange: #ff9900;
+            --primary-orange-dark: #e68900;
+            --primary-pink: #ff6bcb;
+            
+            --bg-darkest: #0a0a0a;
+            --bg-darker: #111111;
+            --bg-dark: #151515;
+            --bg-medium: #1a1a1a;
+            --bg-light: #1f1f1f;
+            
+            --text-primary: #ffffff;
+            --text-secondary: #e0e0e0;
+            --text-tertiary: #b3b3b3;
+            
+            --border-dark: #2a2a2a;
+            --border-medium: #333333;
+            --border-light: #404040;
+            
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --shadow-xl: 0 12px 48px rgba(0, 0, 0, 0.6);
+            
+            --gradient-purple: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-light) 100%);
+            --gradient-green: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-light) 100%);
+            --gradient-blue: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-light) 100%);
+            --gradient-dark: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
+            
+            --transition-fast: all 0.2s ease;
+            --transition-normal: all 0.3s ease;
+            --transition-slow: all 0.5s ease;
+            
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --radius-xl: 18px;
+            --radius-circle: 50%;
+            
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 12px;
+            --space-lg: 16px;
+            --space-xl: 20px;
+            --space-xxl: 24px;
         }
         
-        @keyframes slideInRight {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-
-        /* =========================================================
-           COMPONENTES DO MENU
-           ========================================================= */
-
-        h1 {
-            color: var(--color-primary);
-            margin-bottom: 30px;
-            font-size: 3em;
+        
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+            height: 100%;
         }
-
-        .menu-buttons button {
-            background-color: var(--color-primary);
-            color: var(--color-text);
-            border: none;
-            padding: 15px 30px;
-            margin: 10px;
-            border-radius: 10px;
-            font-size: 1.2em;
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-darkest);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* ===== LAYOUT PRINCIPAL ===== */
+        .app-container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0;
+            position: relative;
+        }
+        
+        /* ===== HEADER FIXO ===== */
+        .app-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-medium);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            padding: 0 var(--space-lg);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        
+        .logo-icon {
+            font-size: 24px;
+            color: var(--primary-purple);
+        }
+        
+        .logo-text {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 20px;
+            background: var(--gradient-purple);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .header-spacer {
+            flex-grow: 1;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: var(--space-sm);
+        }
+        
+        .header-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-circle);
+            background: var(--gradient-dark);
+            border: 1px solid var(--border-medium);
+            color: var(--text-secondary);
+            font-size: 18px;
             cursor: pointer;
-            transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
-            box-shadow: 0 4px 10px var(--shadow-color);
-            width: 250px;
+            transition: var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-
-        .menu-buttons button:hover {
-            background-color: var(--color-primary-hover);
+        
+        .header-btn:hover {
+            background: var(--gradient-purple);
+            color: white;
             transform: translateY(-2px);
-            box-shadow: 0 6px 15px var(--shadow-color);
         }
-
-        /* =========================================================
-           CONFIGURAÇÕES (SETTINGS) E RANKING
-           ========================================================= */
-
+        
+        /* ===== NAVEGAÇÃO INFERIOR ===== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid var(--border-medium);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 var(--space-sm);
+        }
+        
+        .nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            color: var(--text-tertiary);
+            font-size: 12px;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            padding: var(--space-sm);
+            border-radius: var(--radius-md);
+            min-width: 70px;
+        }
+        
+        .nav-btn i {
+            font-size: 20px;
+        }
+        
+        .nav-btn.active {
+            color: var(--primary-purple);
+            background: rgba(138, 43, 226, 0.1);
+        }
+        
+        .nav-btn:hover:not(.active) {
+            color: var(--text-secondary);
+        }
+        
+        /* ===== CONTEÚDO PRINCIPAL ===== */
+        .main-content {
+            padding: 70px var(--space-lg) 80px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        /* ===== PÁGINA INICIAL ===== */
+        .welcome-card {
+            background: var(--gradient-dark);
+            border-radius: var(--radius-xl);
+            padding: var(--space-xxl);
+            text-align: center;
+            margin-bottom: var(--space-xl);
+            border: 1px solid var(--border-dark);
+            box-shadow: var(--shadow-md);
+            animation: slideInDown 0.5s ease;
+        }
+        
+        .welcome-icon {
+            font-size: 48px;
+            color: var(--primary-purple);
+            margin-bottom: var(--space-lg);
+            animation: pulse 2s infinite;
+        }
+        
+        .welcome-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: var(--space-sm);
+            background: var(--gradient-purple);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .welcome-text {
+            color: var(--text-tertiary);
+            margin-bottom: var(--space-xl);
+        }
+        
+        /* ===== CARDS ===== */
+        .card {
+            background: var(--gradient-dark);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-lg);
+            border: 1px solid var(--border-dark);
+            transition: var(--transition-normal);
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: var(--space-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        
+        .card-title i {
+            color: var(--primary-purple);
+        }
+        
+        /* ===== PROGRESSO ===== */
+        .progress-container {
+            margin-bottom: var(--space-xl);
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-md);
+        }
+        
+        .progress-label {
+            font-size: 14px;
+            color: var(--text-tertiary);
+        }
+        
+        .progress-value {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--primary-purple);
+        }
+        
+        .progress-bar {
+            height: 12px;
+            background-color: var(--bg-darker);
+            border-radius: var(--radius-pill);
+            overflow: hidden;
+            margin-bottom: var(--space-md);
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-purple);
+            border-radius: var(--radius-pill);
+            width: 0%;
+            transition: width 1s cubic-bezier(0.22, 0.61, 0.36, 1);
+        }
+        
+        .progress-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+        
+        /* ===== LISTA DE EXERCÍCIOS ===== */
+        .workout-list {
+            margin-bottom: var(--space-xl);
+        }
+        
+        .workout-item {
+            background: var(--gradient-dark);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-md);
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+            border: 1px solid var(--border-dark);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            animation: slideInRight 0.3s ease;
+            animation-fill-mode: both;
+        }
+        
+        .workout-item:hover {
+            border-color: var(--primary-purple);
+            transform: translateX(4px);
+        }
+        
+        .workout-item.completed {
+            opacity: 0.7;
+            border-color: var(--primary-green);
+        }
+        
+        .workout-checkbox {
+            min-width: 24px;
+            height: 24px;
+            border-radius: var(--radius-circle);
+            border: 2px solid var(--border-medium);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: var(--transition-fast);
+        }
+        
+        .workout-item.completed .workout-checkbox {
+            background: var(--gradient-green);
+            border-color: var(--primary-green);
+        }
+        
+        .workout-checkbox i {
+            font-size: 12px;
+            color: white;
+            opacity: 0;
+            transform: scale(0);
+            transition: var(--transition-fast);
+        }
+        
+        .workout-item.completed .workout-checkbox i {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .workout-details {
+            flex-grow: 1;
+        }
+        
+        .workout-name {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 2px;
+        }
+        
+        .workout-description {
+            color: var(--text-tertiary);
+            font-size: 14px;
+        }
+        
+        .workout-type {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: var(--radius-pill);
+            font-size: 10px;
+            font-weight: 600;
+            margin-top: var(--space-sm);
+        }
+        
+        .workout-type.warmup {
+            background-color: rgba(255, 153, 0, 0.2);
+            color: var(--primary-orange);
+        }
+        
+        .workout-type.exercise {
+            background-color: rgba(138, 43, 226, 0.2);
+            color: var(--primary-purple-light);
+        }
+        
+        .workout-type.rest {
+            background-color: rgba(51, 153, 255, 0.2);
+            color: var(--primary-blue);
+        }
+        
+        .workout-actions {
+            display: flex;
+            gap: var(--space-sm);
+        }
+        
+        .workout-action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-circle);
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-medium);
+            color: var(--text-tertiary);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .workout-action-btn:hover {
+            background-color: rgba(138, 43, 226, 0.2);
+            color: var(--primary-purple-light);
+            transform: rotate(15deg);
+        }
+        
+        /* ===== CONTROLES ===== */
+        .controls {
+            display: flex;
+            gap: var(--space-md);
+            margin-bottom: var(--space-xl);
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: var(--space-lg) var(--space-xl);
+            border-radius: var(--radius-md);
+            border: none;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition-normal);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+            flex: 1;
+            min-width: 140px;
+        }
+        
+        .btn-primary {
+            background: var(--gradient-purple);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-purple-dark);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-secondary {
+            background: var(--gradient-dark);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-medium);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-success {
+            background: var(--gradient-green);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: var(--primary-green-dark);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-warning {
+            background: var(--gradient-blue);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: var(--primary-blue-dark);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        /* ===== TIMERS ===== */
+        .timers-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+        
+        .timer-card {
+            background: var(--gradient-dark);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            text-align: center;
+            border: 1px solid var(--border-dark);
+        }
+        
+        .timer-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: var(--space-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+        }
+        
+        .timer-title i {
+            color: var(--primary-purple);
+        }
+        
+        .timer-display {
+            font-size: 48px;
+            font-weight: 800;
+            font-family: 'Montserrat', sans-serif;
+            margin: var(--space-lg) 0;
+            color: var(--text-primary);
+            text-shadow: 0 0 10px rgba(138, 43, 226, 0.3);
+        }
+        
+        .timer-controls {
+            display: flex;
+            gap: var(--space-md);
+            justify-content: center;
+        }
+        
+        .timer-btn {
+            padding: var(--space-md) var(--space-lg);
+            border-radius: var(--radius-md);
+            border: none;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition-normal);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+            min-width: 100px;
+        }
+        
+        /* ===== HISTÓRICO ===== */
+        .history-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-dark);
+            background-color: var(--bg-darker);
+        }
+        
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--border-medium);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .history-date {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .history-time {
+            color: var(--text-tertiary);
+            font-size: 12px;
+            margin-top: 2px;
+        }
+        
+        .history-stats {
+            display: flex;
+            gap: var(--space-lg);
+        }
+        
+        .history-stat {
+            text-align: center;
+        }
+        
+        .history-stat-value {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--primary-green);
+        }
+        
+        .history-stat-label {
+            font-size: 10px;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* ===== ESTATÍSTICAS ===== */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: var(--space-lg);
+            border-radius: var(--radius-md);
+            background: var(--gradient-dark);
+            border: 1px solid var(--border-dark);
+        }
+        
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-circle);
+            margin: 0 auto var(--space-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            background: var(--gradient-purple);
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: var(--space-xs);
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+        
+        /* ===== CONFIGURAÇÕES ===== */
+        .settings-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+        
         .setting-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid var(--color-text-secondary);
+            padding: var(--space-lg);
+            background: var(--gradient-dark);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-dark);
         }
         
-        .setting-item label {
-            font-size: 1.1em;
-        }
-
-        .ranking-list, .help-content, .about-content {
-            margin-top: 20px;
-            text-align: left;
-        }
-        
-        .ranking-item {
+        .setting-info {
             display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px dotted var(--color-text-secondary);
-        }
-
-        .back-button {
-            background-color: var(--color-accent);
-            color: var(--bg-body);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1em;
-            margin-top: 20px;
-            align-self: flex-start;
-        }
-
-        /* =========================================================
-           TELA DE JOGO (GAME SCREEN)
-           ========================================================= */
-
-        .game-header {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            max-width: 400px;
-            margin-bottom: 15px;
-            font-size: 1.1em;
-            font-weight: bold;
-        }
-
-        #gameCanvas {
-            border: 5px solid var(--color-primary);
-            background-color: var(--bg-screen);
-            box-shadow: 0 0 20px var(--shadow-color);
-            border-radius: 8px;
-        }
-
-        .game-controls button {
-            background-color: var(--color-accent);
-            color: var(--bg-body);
-            border: none;
-            padding: 10px 20px;
-            margin-top: 15px;
-            margin-right: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1em;
-            box-shadow: 0 3px 8px var(--shadow-color);
-        }
-
-        /* =========================================================
-           TEMA SWITCH 
-           ========================================================= */
-
-        .theme-toggle-wrapper {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 10;
+            align-items: center;
+            gap: var(--space-md);
         }
         
-        .theme-toggle {
-            --toggle-size: 1.5em;
+        .setting-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-circle);
+            background: rgba(138, 43, 226, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-purple);
+        }
+        
+        .setting-text h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        
+        .setting-text p {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+        
+        .switch {
             position: relative;
             display: inline-block;
-            width: calc(var(--toggle-size) * 2);
-            height: var(--toggle-size);
+            width: 50px;
+            height: 26px;
         }
         
-        .theme-toggle input {
+        .switch input {
             opacity: 0;
             width: 0;
             height: 0;
@@ -270,838 +750,2078 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #ccc;
-            transition: 0.4s;
-            border-radius: var(--toggle-size);
+            background-color: var(--bg-darker);
+            border: 1px solid var(--border-medium);
+            transition: var(--transition-fast);
+            border-radius: var(--radius-pill);
         }
         
         .slider:before {
             position: absolute;
             content: "";
-            height: calc(var(--toggle-size) * 0.8);
-            width: calc(var(--toggle-size) * 0.8);
-            left: calc(var(--toggle-size) * 0.1);
-            bottom: calc(var(--toggle-size) * 0.1);
-            background-color: white;
-            transition: 0.4s;
-            border-radius: 50%;
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 3px;
+            background-color: var(--text-secondary);
+            transition: var(--transition-fast);
+            border-radius: var(--radius-circle);
         }
         
         input:checked + .slider {
-            background-color: var(--color-primary);
-        }
-        
-        input:focus + .slider {
-            box-shadow: 0 0 1px var(--color-primary);
+            background: var(--gradient-purple);
+            border-color: var(--primary-purple);
         }
         
         input:checked + .slider:before {
-            transform: translateX(var(--toggle-size));
+            transform: translateX(22px);
+            background-color: white;
         }
-
-        .slider-icons {
-            position: absolute;
-            width: 100%;
-            height: 100%;
+        
+        /* ===== NOTIFICAÇÕES ===== */
+        .notification-container {
+            position: fixed;
+            top: 70px;
+            right: var(--space-lg);
+            z-index: 1001;
             display: flex;
-            justify-content: space-around;
+            flex-direction: column;
+            gap: var(--space-md);
+            max-width: 300px;
+        }
+        
+        .notification {
+            background: var(--gradient-dark);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-dark);
+            display: flex;
             align-items: center;
-            padding: 0 4px;
-            pointer-events: none;
+            gap: var(--space-md);
+            transform: translateX(100%);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .notification::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--gradient-purple);
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        
+        .notification-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-circle);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+            background: var(--gradient-purple);
             color: white;
         }
-
-        .slider-icons .fa-moon { color: var(--color-text); }
-        .slider-icons .fa-sun { color: gold; }
-
-        /* =========================================================
-           EFEITO DE BOLINHAS CAINDO (Confetes)
-           ========================================================= */
-        .bolinha {
+        
+        .notification-content {
+            flex-grow: 1;
+        }
+        
+        .notification-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+        
+        .notification-message {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+        
+        .notification-close {
+            background: none;
+            border: none;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            font-size: 16px;
+            transition: var(--transition-fast);
+            width: 28px;
+            height: 28px;
+            border-radius: var(--radius-circle);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .notification-close:hover {
+            color: var(--text-primary);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* ===== MODAIS ===== */
+        .modal-overlay {
             position: fixed;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            bottom: -50px;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
             opacity: 0;
-            z-index: 9999;
-            animation: fallAndFade 0.8s ease-out forwards;
+            visibility: hidden;
+            transition: var(--transition-slow);
+            backdrop-filter: blur(5px);
         }
-
-        @keyframes fallAndFade {
-            0% {
-                transform: translateY(0) rotate(0deg);
-                opacity: 1;
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal {
+            background: var(--gradient-dark);
+            border-radius: var(--radius-lg);
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: var(--space-xl);
+            box-shadow: var(--shadow-xl);
+            transform: translateY(50px) scale(0.9);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 1px solid var(--border-dark);
+        }
+        
+        .modal-overlay.active .modal {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            background: var(--gradient-purple);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-tertiary);
+            font-size: 24px;
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+        
+        .modal-close:hover {
+            color: var(--text-primary);
+            transform: rotate(90deg);
+        }
+        
+        /* ===== FORMULÁRIOS ===== */
+        .form-group {
+            margin-bottom: var(--space-lg);
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: var(--space-sm);
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: var(--space-md) var(--space-lg);
+            border-radius: var(--radius-md);
+            background-color: var(--bg-darker);
+            border: 1px solid var(--border-medium);
+            color: var(--text-primary);
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            transition: var(--transition-fast);
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.2);
+        }
+        
+        /* ===== RODAPÉ ===== */
+        .app-footer {
+            text-align: center;
+            padding: var(--space-xl) var(--space-lg);
+            color: var(--text-tertiary);
+            font-size: 12px;
+            border-top: 1px solid var(--border-medium);
+            margin-top: var(--space-xl);
+        }
+        
+        .watermark {
+            margin-top: var(--space-lg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+        
+        .creator {
+            font-weight: 600;
+            color: var(--primary-purple);
+        }
+        
+        .social-link {
+            color: var(--primary-green);
+            text-decoration: none;
+            transition: var(--transition-fast);
+        }
+        
+        .social-link:hover {
+            color: var(--primary-purple);
+        }
+        
+        /* ===== ANIMAÇÕES ===== */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideInDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes slideInUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideInLeft {
+            from { transform: translateX(-50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .animate-pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        .animate-bounce {
+            animation: bounce 1s infinite;
+        }
+        
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+        
+        /* ===== UTILITÁRIOS ===== */
+        .text-center { text-align: center; }
+        .mt-1 { margin-top: var(--space-xs); }
+        .mt-2 { margin-top: var(--space-sm); }
+        .mt-3 { margin-top: var(--space-md); }
+        .mt-4 { margin-top: var(--space-lg); }
+        .mt-5 { margin-top: var(--space-xl); }
+        
+        .mb-1 { margin-bottom: var(--space-xs); }
+        .mb-2 { margin-bottom: var(--space-sm); }
+        .mb-3 { margin-bottom: var(--space-md); }
+        .mb-4 { margin-bottom: var(--space-lg); }
+        .mb-5 { margin-bottom: var(--space-xl); }
+        
+        .d-none { display: none; }
+        .d-block { display: block; }
+        .d-flex { display: flex; }
+        
+        .w-100 { width: 100%; }
+        
+        /* ===== RESPONSIVIDADE ===== */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 70px var(--space-md) 80px;
             }
-            100% {
-                transform: translateY(-100vh) rotate(720deg);
-                opacity: 0;
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .timers-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .history-stats {
+                flex-direction: column;
+                gap: var(--space-sm);
             }
         }
-
+        
+        @media (max-width: 480px) {
+            .welcome-card {
+                padding: var(--space-xl);
+            }
+            
+            .card {
+                padding: var(--space-lg);
+            }
+            
+            .timer-display {
+                font-size: 36px;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* ===== SCROLLBAR PERSONALIZADA ===== */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-darker);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--gradient-purple);
+            border-radius: var(--radius-pill);
+        }
+        
+        /* ===== LOADING ===== */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: var(--space-xxl);
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-dark);
+            border-top-color: var(--primary-purple);
+            border-radius: var(--radius-circle);
+            animation: spin 1s linear infinite;
+        }
+        
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: var(--space-xxl) var(--space-lg);
+        }
+        
+        .empty-state-icon {
+            font-size: 48px;
+            color: var(--text-tertiary);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .empty-state-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: var(--space-md);
+            color: var(--text-secondary);
+        }
+        
+        .empty-state-text {
+            color: var(--text-tertiary);
+            margin-bottom: var(--space-xl);
+        }
     </style>
 </head>
 <body>
-
-    <div class="theme-toggle-wrapper">
-        <label class="theme-toggle">
-            <input type="checkbox" id="themeSwitch">
-            <span class="slider">
-                 <div class="slider-icons">
-                    <i class="fas fa-moon"></i>
-                    <i class="fas fa-sun"></i>
+    <!-- Container de Notificações -->
+    <div class="notification-container" id="notification-container"></div>
+    
+    <!-- Header Fixo -->
+    <header class="app-header">
+        <div class="logo">
+            <i class="fas fa-dumbbell logo-icon"></i>
+            <div class="logo-text">FitTrack Pro</div>
+        </div>
+        <div class="header-spacer"></div>
+        <div class="header-actions">
+            <button class="header-btn" id="notification-btn" title="Notificações">
+                <i class="fas fa-bell"></i>
+            </button>
+            <button class="header-btn" id="sound-toggle" title="Alternar Sons">
+                <i class="fas fa-volume-up"></i>
+            </button>
+        </div>
+    </header>
+    
+    <!-- Conteúdo Principal -->
+    <div class="main-content">
+        <!-- Página Inicial -->
+        <div class="page active" id="page-home">
+            <div class="welcome-card">
+                <i class="fas fa-dumbbell welcome-icon animate-pulse"></i>
+                <h1 class="welcome-title">Bem-vindo ao FitTrack Pro!</h1>
+                <p class="welcome-text">Seu aplicativo completo para acompanhar treinos e alcançar seus objetivos fitness.</p>
+                <button class="btn btn-primary" id="start-tutorial">
+                    <i class="fas fa-play-circle"></i>
+                    Começar Tutorial
+                </button>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">
+                    <i class="fas fa-chart-line"></i>
+                    Seu Progresso Hoje
+                </h2>
+                <div class="progress-container">
+                    <div class="progress-header">
+                        <span class="progress-label">Progresso do Treino</span>
+                        <span class="progress-value" id="progress-percentage">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <div class="progress-stats">
+                        <span id="progress-exercises">0/7 exercícios</span>
+                        <span id="progress-time">Tempo estimado: 15 min</span>
+                    </div>
                 </div>
-            </span>
-        </label>
+            </div>
+            
+            <div class="controls">
+                <button class="btn btn-primary" id="start-workout">
+                    <i class="fas fa-play"></i>
+                    Iniciar Treino
+                </button>
+                <button class="btn btn-secondary" id="edit-workout">
+                    <i class="fas fa-edit"></i>
+                    Personalizar
+                </button>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">
+                    <i class="fas fa-bullseye"></i>
+                    Seus Objetivos
+                </h2>
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="stat-value" id="goal-calories">500</div>
+                        <div class="stat-label">Calorias/Dia</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-value" id="goal-minutes">30</div>
+                        <div class="stat-label">Minutos/Dia</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-dumbbell"></i>
+                        </div>
+                        <div class="stat-value" id="goal-workouts">5</div>
+                        <div class="stat-label">Treinos/Semana</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Página de Treinos -->
+        <div class="page" id="page-workouts">
+            <div class="card">
+                <h2 class="card-title">
+                    <i class="fas fa-dumbbell"></i>
+                    Rotina de Treino
+                </h2>
+                <div class="workout-list" id="workout-list">
+                    <!-- Lista de exercícios será gerada aqui -->
+                </div>
+                <div class="controls">
+                    <button class="btn btn-success" id="complete-workout">
+                        <i class="fas fa-flag-checkered"></i>
+                        Finalizar Treino
+                    </button>
+                    <button class="btn btn-secondary" id="reset-workout">
+                        <i class="fas fa-redo"></i>
+                        Reiniciar
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">
+                    <i class="fas fa-stopwatch"></i>
+                    Timers
+                </h2>
+                <div class="timers-container">
+                    <div class="timer-card">
+                        <h3 class="timer-title">
+                            <i class="fas fa-stopwatch"></i>
+                            Timer de Prancha
+                        </h3>
+                        <div class="timer-display" id="plank-timer">30s</div>
+                        <div class="timer-controls">
+                            <button class="timer-btn btn-primary" id="plank-start">
+                                <i class="fas fa-play"></i>
+                                Iniciar
+                            </button>
+                            <button class="timer-btn btn-warning" id="plank-pause" style="display: none;">
+                                <i class="fas fa-pause"></i>
+                                Pausar
+                            </button>
+                            <button class="timer-btn btn-secondary" id="plank-reset">
+                                <i class="fas fa-redo"></i>
+                                Reiniciar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="timer-card">
+                        <h3 class="timer-title">
+                            <i class="fas fa-couch"></i>
+                            Timer de Descanso
+                        </h3>
+                        <div class="timer-display" id="rest-timer">60s</div>
+                        <div class="timer-controls">
+                            <button class="timer-btn btn-primary" id="rest-start">
+                                <i class="fas fa-play"></i>
+                                Iniciar
+                            </button>
+                            <button class="timer-btn btn-warning" id="rest-pause" style="display: none;">
+                                <i class="fas fa-pause"></i>
+                                Pausar
+                            </button>
+                            <button class="timer-btn btn-secondary" id="rest-reset">
+                                <i class="fas fa-redo"></i>
+                                Reiniciar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Página de Estatísticas -->
+        <div class="page" id="page-stats">
+            <div class="card">
+                <h2 class="card-title">
+                    <i class="fas fa-chart-bar"></i>
+                    Suas Estatísticas
+                </h2>
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="stat-value" id="stat-calories">0</div>
+                        <div class="stat-label">Calorias Hoje</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-value" id="stat-minutes">0</div>
+                        <div class="stat-label">Minutos Hoje</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-dumbbell"></i>
+                        </div>
+                        <div class="stat-value" id="stat-workouts">0</div>
+                        <div class="stat-label">Treinos Completos</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="stat-value" id="stat-streak">0</div>
+                        <div class="stat-label">Dias Consecutivos</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">
+                    <i class="fas fa-history"></i>
+                    Histórico de Treinos
+                </h2>
+                <div class="history-list" id="history-list">
+                    <!-- Histórico será carregado aqui -->
+                    <div class="empty-state">
+                        <i class="fas fa-history empty-state-icon"></i>
+                        <h3 class="empty-state-title">Nenhum treino registrado</h3>
+                        <p class="empty-state-text">Complete seu primeiro treino para ver o histórico aqui.</p>
+                    </div>
+                </div>
+                <div class="controls mt-4">
+                    <button class="btn btn-secondary" id="clear-history">
+                        <i class="fas fa-trash"></i>
+                        Limpar Histórico
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Página de Configurações -->
+        <div class="page" id="page-settings">
+            <div class="card">
+                <h2 class="card-title">
+                    <i class="fas fa-cog"></i>
+                    Configurações
+                </h2>
+                <div class="settings-list">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="setting-text">
+                                <h4>Perfil</h4>
+                                <p>Configure suas informações pessoais</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary" id="edit-profile">
+                            <i class="fas fa-edit"></i>
+                            Editar
+                        </button>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-icon">
+                                <i class="fas fa-volume-up"></i>
+                            </div>
+                            <div class="setting-text">
+                                <h4>Sons</h4>
+                                <p>Ativar/desativar sons do aplicativo</p>
+                            </div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="sound-toggle-switch" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-icon">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <div class="setting-text">
+                                <h4>Notificações</h4>
+                                <p>Receber lembretes de treino</p>
+                            </div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="notification-toggle-switch" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-icon">
+                                <i class="fas fa-moon"></i>
+                            </div>
+                            <div class="setting-text">
+                                <h4>Modo Escuro</h4>
+                                <p>Tema escuro para melhor visualização</p>
+                            </div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="dark-mode-switch" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-icon">
+                                <i class="fas fa-dumbbell"></i>
+                            </div>
+                            <div class="setting-text">
+                                <h4>Rotina de Treino</h4>
+                                <p>Personalize seus exercícios</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary" id="customize-workout">
+                            <i class="fas fa-sliders-h"></i>
+                            Personalizar
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">
+                    <i class="fas fa-info-circle"></i>
+                    Sobre o App
+                </h2>
+                <div class="settings-list">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-icon">
+                                <i class="fas fa-code"></i>
+                            </div>
+                            <div class="setting-text">
+                                <h4>Versão</h4>
+                                <p>FitTrack Pro v2.0</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-icon">
+                                <i class="fas fa-user-tie"></i>
+                            </div>
+                            <div class="setting-text">
+                                <h4>Desenvolvedor</h4>
+                                <p>ELS (Everton Lima)</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-icon">
+                                <i class="fab fa-instagram"></i>
+                            </div>
+                            <div class="setting-text">
+                                <h4>Instagram</h4>
+                                <p>@everton.lima_17</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary" id="visit-instagram">
+                            <i class="fas fa-external-link-alt"></i>
+                            Visitar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <div class="screen-container">
-        
-        <div class="menu-screen" id="menuScreen" style="display: flex;">
-            <h1>SNAKE GAME</h1>
-            
-            <div class="menu-buttons">
-                <button id="btnStartGame"><i class="fas fa-play"></i> INICIAR JOGO</button>
-                <button id="btnShowSettings"><i class="fas fa-cog"></i> CONFIGURAÇÕES</button>
-                <button id="btnShowRanking"><i class="fas fa-trophy"></i> RANKING</button>
-                <button id="btnShowHelp"><i class="fas fa-question-circle"></i> AJUDA</button>
-                <button id="btnShowAbout"><i class="fas fa-info-circle"></i> SOBRE</button>
+    
+    <!-- Navegação Inferior -->
+    <nav class="bottom-nav">
+        <button class="nav-btn active" data-page="home">
+            <i class="fas fa-home"></i>
+            Início
+        </button>
+        <button class="nav-btn" data-page="workouts">
+            <i class="fas fa-dumbbell"></i>
+            Treinos
+        </button>
+        <button class="nav-btn" data-page="stats">
+            <i class="fas fa-chart-bar"></i>
+            Estatísticas
+        </button>
+        <button class="nav-btn" data-page="settings">
+            <i class="fas fa-cog"></i>
+            Configurações
+        </button>
+    </nav>
+    
+    <!-- Modal de Edição de Perfil -->
+    <div class="modal-overlay" id="profile-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <i class="fas fa-user-edit"></i>
+                    Editar Perfil
+                </h2>
+                <button class="modal-close" id="close-profile-modal">&times;</button>
+            </div>
+            <div class="modal-content">
+                <form id="profile-form">
+                    <div class="form-group">
+                        <label class="form-label" for="user-name">Seu Nome</label>
+                        <input type="text" id="user-name" class="form-control" placeholder="Digite seu nome" value="">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="user-age">Idade</label>
+                        <input type="number" id="user-age" class="form-control" placeholder="Sua idade" min="10" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="user-weight">Peso (kg)</label>
+                        <input type="number" id="user-weight" class="form-control" placeholder="Seu peso em kg" min="30" max="200" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="user-goal">Objetivo</label>
+                        <select id="user-goal" class="form-control">
+                            <option value="lose">Perder Peso</option>
+                            <option value="maintain">Manter Peso</option>
+                            <option value="gain">Ganhar Massa</option>
+                        </select>
+                    </div>
+                    <div class="controls mt-4">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-save"></i>
+                            Salvar Alterações
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
-
-        <div class="game-screen" id="gameScreen">
-            <div class="game-header">
-                <div>SCORE: <span id="score">0</span></div>
-                <div>HIGHSCORE: <span id="highScore">0</span></div>
-                <div>VELOCIDADE: <span id="speed">10.0x</span></div>
-            </div>
-            
-            <canvas id="gameCanvas" width="400" height="400"></canvas>
-            
-            <div class="game-controls">
-                <button id="pauseBtn"><i class="fas fa-pause"></i> PAUSAR</button>
-                <button id="resetBtn"><i class="fas fa-redo"></i> RESETAR</button>
-                <button id="btnBackGame"><i class="fas fa-arrow-left"></i> VOLTAR AO MENU</button>
-            </div>
-        </div>
-        
-        <div class="settings-screen" id="settingsScreen">
-            <h2><i class="fas fa-cog"></i> Configurações</h2>
-            
-            <div class="setting-item">
-                <label for="speedSlider">Velocidade do Jogo (ms)</label>
-                <input type="range" id="speedSlider" min="50" max="300" step="10">
-                <span id="speedValue">100ms</span>
-            </div>
-            
-            <div class="setting-item">
-                <label for="sizeSlider">Tamanho do Campo (px)</label>
-                <input type="range" id="sizeSlider" min="200" max="600" step="40">
-                <span id="sizeValue">400px</span>
-            </div>
-
-            <div class="setting-item">
-                <label for="snakeColor">Cor da Cobra</label>
-                <input type="color" id="snakeColor" value="#5865F2">
-            </div>
-
-            <button class="back-button" id="btnSaveSettings"><i class="fas fa-save"></i> Salvar e Aplicar</button>
-            <button class="back-button" id="btnBackSettings"><i class="fas fa-arrow-left"></i> Voltar</button>
-        </div>
-        
-        <div class="ranking-screen" id="rankingScreen">
-            <h2><i class="fas fa-trophy"></i> Ranking</h2>
-            
-            <div class="ranking-list" id="rankingList">
-                <p>Nenhum recorde encontrado.</p>
-            </div>
-            
-            <button class="back-button" id="btnBackRanking"><i class="fas fa-arrow-left"></i> Voltar</button>
-        </div>
-
-        <div class="help-screen" id="helpScreen">
-            <h2><i class="fas fa-question-circle"></i> Ajuda</h2>
-            <div class="help-content">
-                <h3>Controles:</h3>
-                <ul>
-                    <li>**Teclas de Seta (ou W, A, S, D):** Movem a cobra.</li>
-                    <li>**P (ou botão PAUSAR):** Pausa/Despausa o jogo.</li>
-                    <li>**R (ou botão RESETAR):** Reinicia o jogo.</li>
-                </ul>
-                
-                <h3>Pontuação:</h3>
-                <p>Cada fruta normal (maçã, banana, etc.) vale 1 ponto. A fruta de ouro (Gold) vale 5 pontos.</p>
-            </div>
-            <button class="back-button" id="btnBackHelp"><i class="fas fa-arrow-left"></i> Voltar</button>
-        </div>
-
-        <div class="about-screen" id="aboutScreen">
-            <h2><i class="fas fa-info-circle"></i> Sobre</h2>
-            <div class="about-content">
-                <p>Este é um projeto de Snake Game desenvolvido com foco em uma experiência de usuário moderna, utilizando transições CSS e aprimoramentos visuais no Canvas.</p>
-                <p>Desenvolvido para demonstração e aprendizado.</p>
-            </div>
-            <button class="back-button" id="btnBackAbout"><i class="fas fa-arrow-left"></i> Voltar</button>
-        </div>
-
     </div>
-
+    
+    <!-- Modal de Edição de Treino -->
+    <div class="modal-overlay" id="workout-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <i class="fas fa-edit"></i>
+                    Personalizar Treino
+                </h2>
+                <button class="modal-close" id="close-workout-modal">&times;</button>
+            </div>
+            <div class="modal-content">
+                <div id="workout-edit-list">
+                    <!-- Lista de exercícios editáveis será gerada aqui -->
+                </div>
+                <div class="controls mt-4">
+                    <button class="btn btn-primary" id="add-exercise">
+                        <i class="fas fa-plus"></i>
+                        Adicionar Exercício
+                    </button>
+                    <button class="btn btn-success" id="save-workout">
+                        <i class="fas fa-save"></i>
+                        Salvar Alterações
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Rodapé -->
+    <footer class="app-footer">
+        <p>FitTrack Pro - Aplicativo de Acompanhamento de Treinos</p>
+        <div class="watermark">
+            <span class="creator">Criado por: ELS</span>
+            <a href="https://instagram.com/everton.lima_17" class="social-link" target="_blank">
+                <i class="fab fa-instagram"></i> @everton.lima_17
+            </a>
+        </div>
+    </footer>
+    
+    <!-- Elementos de Áudio -->
+    <audio id="sound-click" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="sound-complete" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="sound-timer-start" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-game-show-countdown-909.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="sound-timer-end" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="sound-notification" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="sound-error" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3" type="audio/mpeg">
+    </audio>
+    
     <script>
-        // =========================================================
-        // FUNÇÕES AUXILIARES, TEMA E EFEITOS
-        // =========================================================
-
-        const themeSwitch = document.getElementById('themeSwitch');
-        
-        /**
-         * Altera a tonalidade de uma cor hexadecimal.
-         */
-        function shadeColor(color, percent) {
-            if (typeof color !== 'string' || color.length !== 7 || color[0] !== '#') {
-                return color; 
-            }
+        // ===== SISTEMA DE ESTADO DO APP =====
+        const AppState = {
+            // Usuário
+            user: {
+                name: "",
+                age: null,
+                weight: null,
+                goal: "lose"
+            },
             
-            let R = parseInt(color.substring(1, 3), 16);
-            let G = parseInt(color.substring(3, 5), 16);
-            let B = parseInt(color.substring(5, 7), 16);
-
-            R = Math.min(255, Math.max(0, parseInt(R * (100 + percent) / 100)));
-            G = Math.min(255, Math.max(0, parseInt(G * (100 + percent) / 100)));
-            B = Math.min(255, Math.max(0, parseInt(B * (100 + percent) / 100)));
-
-            let RR = ((R.toString(16).length == 1) ? "0" + R.toString(16) : R.toString(16));
-            let GG = ((G.toString(16).length == 1) ? "0" + G.toString(16) : G.toString(16));
-            let BB = ((B.toString(16).length == 1) ? "0" + B.toString(16) : B.toString(16));
-
-            return "#" + RR + GG + BB;
-        }
-
-        function applyTheme(isLightMode) {
-            if (isLightMode) {
-                document.body.classList.add('light-mode');
-            } else {
-                document.body.classList.remove('light-mode');
-            }
-        }
-
-        function toggleTheme() {
-            const isLightMode = themeSwitch.checked;
-            applyTheme(isLightMode);
-            localStorage.setItem('snakeTheme', isLightMode ? 'light' : 'dark');
-        }
-
-        function loadTheme() {
-            const savedTheme = localStorage.getItem('snakeTheme') || 'dark';
-            const isLightMode = savedTheme === 'light';
-
-            if(themeSwitch) themeSwitch.checked = isLightMode;
-            applyTheme(isLightMode);
-        }
-        
-        function playSound(soundName) {
-            // Implementação de som omitida
-        }
-        
-        /**
-         * Cria e anima bolinhas caindo (efeito confete) em elementos.
-         */
-        function criarBolinhasCaindo(numBolinhas = 15, elementoAlvo = null) {
-            const colors = [
-                getComputedStyle(document.documentElement).getPropertyValue('--color-primary'),
-                getComputedStyle(document.documentElement).getPropertyValue('--color-accent'), 
-                '#4CAF50', '#FF9800', '#9C27B0'
-            ];
+            // Configurações
+            settings: {
+                sounds: true,
+                notifications: true,
+                darkMode: true
+            },
             
-            const parentElement = document.body;
+            // Treino atual
+            workout: {
+                routine: [
+                    { id: 1, name: "Aquecimento", description: "30 Polichinelos", completed: false, type: "warmup", time: 30 },
+                    { id: 2, name: "Agachamentos", description: "15 repetições", completed: false, type: "exercise", time: 45 },
+                    { id: 3, name: "Flexões", description: "10 repetições", completed: false, type: "exercise", time: 60 },
+                    { id: 4, name: "Afundos", description: "12 cada perna", completed: false, type: "exercise", time: 60 },
+                    { id: 5, name: "Abdominais", description: "20 repetições", completed: false, type: "exercise", time: 45 },
+                    { id: 6, name: "Prancha", description: "30 segundos", completed: false, type: "exercise", time: 30 },
+                    { id: 7, name: "Descanso", description: "60 segundos", completed: false, type: "rest", time: 60 }
+                ],
+                currentExercise: 0,
+                completedToday: false
+            },
             
-            for (let i = 0; i < numBolinhas; i++) {
-                setTimeout(() => {
-                    const bolinha = document.createElement('div');
-                    bolinha.classList.add('bolinha');
-                    
-                    let left = Math.random() * 100;
-                    
-                    if (elementoAlvo) {
-                        const rect = elementoAlvo.getBoundingClientRect();
-                        const parentWidth = window.innerWidth;
-                        const normalizedLeft = (rect.left / parentWidth) * 100;
-                        const normalizedWidth = (rect.width / parentWidth) * 100;
-                        left = normalizedLeft + (normalizedWidth * Math.random());
-                    }
-                    
-                    bolinha.style.left = left + 'vw';
-                    bolinha.style.background = colors[Math.floor(Math.random() * colors.length)];
-                    bolinha.style.animationDuration = (0.8 + Math.random() * 0.7) + 's';
-                    
-                    const tamanho = 10 + Math.random() * 15;
-                    bolinha.style.width = tamanho + 'px';
-                    bolinha.style.height = tamanho + 'px';
-                    
-                    parentElement.appendChild(bolinha);
-                    
-                    bolinha.addEventListener('animationend', () => {
-                        if (bolinha.parentNode) {
-                            bolinha.parentNode.removeChild(bolinha);
-                        }
-                    }, { once: true });
-
-                }, i * 50);
-            }
-        }
-
-        function hideAllScreens() {
-            const screens = [
-                'menuScreen', 'gameScreen', 'settingsScreen',
-                'rankingScreen', 'helpScreen', 'aboutScreen'
-            ];
-
-            screens.forEach(screen => {
-                const elemento = document.getElementById(screen);
-                if (elemento) {
-                    elemento.style.display = 'none';
-                    elemento.classList.remove('tela-saindo', 'tela-entrando');
+            // Estatísticas
+            stats: {
+                calories: 0,
+                minutes: 0,
+                workouts: 0,
+                streak: 0,
+                lastWorkoutDate: null
+            },
+            
+            // Histórico
+            history: [],
+            
+            // Timers
+            timers: {
+                plank: {
+                    time: 30,
+                    running: false,
+                    interval: null
+                },
+                rest: {
+                    time: 60,
+                    running: false,
+                    interval: null
                 }
-            });
-        }
-
-        // =========================================================
-        // FUNÇÃO DE TRANSIÇÃO ENTRE TELAS (CORRIGIDA COM animationend)
-        // =========================================================
-
-        function transicionarTela(telaAtualId, novaTelaId, callback) {
-            const telaAtual = document.getElementById(telaAtualId);
-            const novaTela = document.getElementById(novaTelaId);
+            },
             
-            // 1. Caso de animação de saída:
-            if (telaAtual && telaAtual.style.display !== 'none' && telaAtualId !== novaTelaId) {
-                
-                telaAtual.classList.add('tela-saindo');
-                
-                // Espera a animação de saída terminar
-                const onAnimationEnd = () => {
-                    telaAtual.removeEventListener('animationend', onAnimationEnd);
-                    telaAtual.classList.remove('tela-saindo');
-                    
-                    // Esconde todas as telas e mostra a nova (passo 2)
-                    hideAllScreens();
-                    showNewScreen();
-                };
-                
-                telaAtual.addEventListener('animationend', onAnimationEnd, { once: true });
-                
-            } 
-            // 2. Caso de tela inicial ou transição imediata:
-            else {
-                hideAllScreens();
-                showNewScreen();
+            // Objetivos
+            goals: {
+                calories: 500,
+                minutes: 30,
+                workouts: 5
             }
-
-            // Função interna para mostrar a nova tela
-            function showNewScreen() {
-                if (novaTela) {
-                    novaTela.style.display = (novaTelaId === 'menuScreen' || novaTelaId === 'gameScreen') ? 'flex' : 'block';
-                    novaTela.classList.add('tela-entrando');
-                    
-                    setTimeout(() => {
-                        novaTela.classList.remove('tela-entrando');
-                    }, 500);
-                }
-                
-                if (callback) callback();
+        };
+        
+        // ===== ELEMENTOS DO DOM =====
+        const elements = {
+            // Navegação
+            navButtons: document.querySelectorAll('.nav-btn'),
+            pages: document.querySelectorAll('.page'),
+            
+            // Header
+            notificationBtn: document.getElementById('notification-btn'),
+            soundToggle: document.getElementById('sound-toggle'),
+            
+            // Página Inicial
+            startTutorial: document.getElementById('start-tutorial'),
+            startWorkout: document.getElementById('start-workout'),
+            editWorkout: document.getElementById('edit-workout'),
+            progressPercentage: document.getElementById('progress-percentage'),
+            progressFill: document.getElementById('progress-fill'),
+            progressExercises: document.getElementById('progress-exercises'),
+            progressTime: document.getElementById('progress-time'),
+            
+            // Objetivos
+            goalCalories: document.getElementById('goal-calories'),
+            goalMinutes: document.getElementById('goal-minutes'),
+            goalWorkouts: document.getElementById('goal-workouts'),
+            
+            // Página de Treinos
+            workoutList: document.getElementById('workout-list'),
+            completeWorkout: document.getElementById('complete-workout'),
+            resetWorkout: document.getElementById('reset-workout'),
+            
+            // Timers
+            plankTimer: document.getElementById('plank-timer'),
+            plankStart: document.getElementById('plank-start'),
+            plankPause: document.getElementById('plank-pause'),
+            plankReset: document.getElementById('plank-reset'),
+            restTimer: document.getElementById('rest-timer'),
+            restStart: document.getElementById('rest-start'),
+            restPause: document.getElementById('rest-pause'),
+            restReset: document.getElementById('rest-reset'),
+            
+            // Página de Estatísticas
+            statCalories: document.getElementById('stat-calories'),
+            statMinutes: document.getElementById('stat-minutes'),
+            statWorkouts: document.getElementById('stat-workouts'),
+            statStreak: document.getElementById('stat-streak'),
+            historyList: document.getElementById('history-list'),
+            clearHistory: document.getElementById('clear-history'),
+            
+            // Página de Configurações
+            editProfile: document.getElementById('edit-profile'),
+            soundToggleSwitch: document.getElementById('sound-toggle-switch'),
+            notificationToggleSwitch: document.getElementById('notification-toggle-switch'),
+            darkModeSwitch: document.getElementById('dark-mode-switch'),
+            customizeWorkout: document.getElementById('customize-workout'),
+            visitInstagram: document.getElementById('visit-instagram'),
+            
+            // Modais
+            profileModal: document.getElementById('profile-modal'),
+            closeProfileModal: document.getElementById('close-profile-modal'),
+            profileForm: document.getElementById('profile-form'),
+            userName: document.getElementById('user-name'),
+            userAge: document.getElementById('user-age'),
+            userWeight: document.getElementById('user-weight'),
+            userGoal: document.getElementById('user-goal'),
+            
+            workoutModal: document.getElementById('workout-modal'),
+            closeWorkoutModal: document.getElementById('close-workout-modal'),
+            workoutEditList: document.getElementById('workout-edit-list'),
+            addExercise: document.getElementById('add-exercise'),
+            saveWorkout: document.getElementById('save-workout'),
+            
+            // Notificações
+            notificationContainer: document.getElementById('notification-container'),
+            
+            // Sons
+            sounds: {
+                click: document.getElementById('sound-click'),
+                complete: document.getElementById('sound-complete'),
+                timerStart: document.getElementById('sound-timer-start'),
+                timerEnd: document.getElementById('sound-timer-end'),
+                notification: document.getElementById('sound-notification'),
+                error: document.getElementById('sound-error')
             }
-        }
-
-        // =========================================================
-        // SISTEMA DE IMAGENS PARA FRUTAS (Assets)
-        // =========================================================
-
-        // Tipos de frutas (devem corresponder aos nomes dos arquivos)
-        const FRUIT_TYPES = ['apple', 'watermelon', 'banana', 'orange', 'cherry', 'pineapple', 'grape', 'lemon', 'strawberry']; 
-
-        const fruitImages = {
-            apple: new Image(),
-            banana: new Image(),
-            orange: new Image(),
-            watermelon: new Image(),
-            cherry: new Image(),
-            pineapple: new Image(),
-            grape: new Image(),
-            lemon: new Image(),
-            strawberry: new Image(),
-            gold: new Image() // Fruta especial
         };
-
-        // USANDO CAMINHOS RELATIVOS (ESPERA-SE QUE A PASTA 'images' EXISTA)
-        const fruitImagePaths = {
-            apple: 'images/apple.png',
-            banana: 'images/banana.png',
-            orange: 'images/orange.png',
-            watermelon: 'images/watermelon.png',
-            cherry: 'images/cherry.png',
-            pineapple: 'images/pineapple.png',
-            grape: 'images/grape.png',
-            lemon: 'images/lemon.png',
-            strawberry: 'images/strawberry.png',
-            gold: 'images/gold.png'
-        };
-
-        // Carregar todas as imagens
-        Object.keys(fruitImages).forEach(fruit => {
-            fruitImages[fruit].src = fruitImagePaths[fruit];
-            fruitImages[fruit].onerror = function() {
-                console.error(`Falha ao carregar imagem: ${fruitImages[fruit].src}. Usando fallback.`);
-            };
+        
+        // ===== INICIALIZAÇÃO DO APP =====
+        document.addEventListener('DOMContentLoaded', function() {
+            initApp();
         });
-
-        // =========================================================
-        // CONFIGURAÇÕES E RANKING
-        // =========================================================
         
-        function getDefaultSettings() {
-            return {
-                speed: 100,
-                fieldSize: 400,
-                snakeColor: '#5865F2'
-            };
+        function initApp() {
+            // Carregar dados salvos
+            loadAppData();
+            
+            // Inicializar navegação
+            initNavigation();
+            
+            // Inicializar eventos
+            initEvents();
+            
+            // Inicializar interface
+            initUI();
+            
+            // Mostrar notificação de boas-vindas
+            setTimeout(() => {
+                showNotification('Bem-vindo ao FitTrack Pro!', 'Comece personalizando seu perfil e objetivos.');
+            }, 1000);
+            
+            console.log('FitTrack Pro inicializado com sucesso!');
         }
-
-        function loadSettings() {
-            const settings = JSON.parse(localStorage.getItem('snakeSettings')) || getDefaultSettings();
-
-            document.getElementById('speedSlider').value = settings.speed;
-            document.getElementById('speedValue').textContent = settings.speed + 'ms';
-            
-            document.getElementById('sizeSlider').value = settings.fieldSize;
-            document.getElementById('sizeValue').textContent = settings.fieldSize + 'px';
-            
-            document.getElementById('snakeColor').value = settings.snakeColor;
-            
-            document.getElementById('speedSlider').oninput = function() {
-                document.getElementById('speedValue').textContent = this.value + 'ms';
-            };
-            
-            document.getElementById('sizeSlider').oninput = function() {
-                document.getElementById('sizeValue').textContent = this.value + 'px';
-            };
-        }
-
-        function saveSettings() {
-            const settings = {
-                speed: parseInt(document.getElementById('speedSlider').value),
-                fieldSize: parseInt(document.getElementById('sizeSlider').value),
-                snakeColor: document.getElementById('snakeColor').value
-            };
-            localStorage.setItem('snakeSettings', JSON.stringify(settings));
-            alert('Configurações salvas! Aplique ao iniciar o próximo jogo.');
-        }
-
-        function updateRanking(newScore) {
-            let ranking = JSON.parse(localStorage.getItem('snakeRanking')) || [];
-            
-            const newRecord = { score: newScore, date: new Date().toLocaleString() };
-            ranking.push(newRecord);
-
-            ranking.sort((a, b) => b.score - a.score);
-            ranking = ranking.slice(0, 10);
-
-            localStorage.setItem('snakeRanking', JSON.stringify(ranking));
-
-            const currentHighScore = parseInt(localStorage.getItem('snakeHighScore') || 0);
-            if (newScore > currentHighScore) {
-                localStorage.setItem('snakeHighScore', newScore);
-                document.getElementById('highScore').textContent = newScore;
-            }
-        }
-
-        function loadRanking() {
-            const rankingListDiv = document.getElementById('rankingList');
-            const ranking = JSON.parse(localStorage.getItem('snakeRanking')) || [];
-            rankingListDiv.innerHTML = '';
-
-            if (ranking.length === 0) {
-                rankingListDiv.innerHTML = '<p>Nenhum recorde ainda. Comece a jogar!</p>';
-                return;
-            }
-
-            ranking.forEach((item, index) => {
-                const rankItem = document.createElement('div');
-                rankItem.classList.add('ranking-item');
-                rankItem.innerHTML = `
-                    <span>#${index + 1}</span>
-                    <span>Score: ${item.score}</span>
-                    <span style="font-size: 0.8em; color: var(--color-text-secondary);">${item.date}</span>
-                `;
-                rankingListDiv.appendChild(rankItem);
+        
+        // ===== SISTEMA DE NAVEGAÇÃO =====
+        function initNavigation() {
+            elements.navButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Tocar som
+                    playSound('click');
+                    
+                    // Remover classe active de todos os botões
+                    elements.navButtons.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Adicionar classe active ao botão clicado
+                    this.classList.add('active');
+                    
+                    // Obter página alvo
+                    const pageId = this.getAttribute('data-page');
+                    
+                    // Ocultar todas as páginas
+                    elements.pages.forEach(page => page.classList.remove('active'));
+                    
+                    // Mostrar página alvo
+                    document.getElementById(`page-${pageId}`).classList.add('active');
+                    
+                    // Atualizar conteúdo específico da página
+                    updatePageContent(pageId);
+                });
             });
         }
         
-        // =========================================================
-        // JOGO (Snake) - Variáveis e Funções Principais
-        // =========================================================
-
-        let canvas, ctx;
-        let snake = [];
-        let food = {};
-        let direction = 'right';
-        let nextDirection = 'right';
-        let score = 0;
-        let highScore = 0;
-        let gameSpeed = 100;
-        let gameRunning = true;
-        let gameLoop;
-        let gameTick = 0; 
-
-        function initGame() {
-            const settings = JSON.parse(localStorage.getItem('snakeSettings')) || getDefaultSettings();
-
-            canvas = document.getElementById('gameCanvas');
-            canvas.width = settings.fieldSize;
-            canvas.height = settings.fieldSize;
-            ctx = canvas.getContext('2d');
-
-            snake = [{ x: 10, y: 10 }];
-            direction = 'right';
-            nextDirection = 'right';
-            score = 0;
-            gameSpeed = settings.speed;
-            gameRunning = true;
-            gameTick = 0;
-
-            highScore = localStorage.getItem('snakeHighScore') || 0;
-            document.getElementById('highScore').textContent = highScore;
-            document.getElementById('score').textContent = score;
-            document.getElementById('speed').textContent = (1000 / gameSpeed).toFixed(1) + 'x';
-            
-            document.getElementById('pauseBtn').innerHTML = '<i class="fas fa-pause"></i> PAUSAR';
-
-            generateFood();
-            draw();
-
-            if (gameLoop) clearInterval(gameLoop);
-            gameLoop = setInterval(update, gameSpeed);
-
-            document.removeEventListener('keydown', handleKeyPress);
-            document.addEventListener('keydown', handleKeyPress);
+        function updatePageContent(pageId) {
+            switch(pageId) {
+                case 'home':
+                    updateProgress();
+                    updateGoals();
+                    break;
+                case 'workouts':
+                    renderWorkoutList();
+                    break;
+                case 'stats':
+                    updateStats();
+                    renderHistory();
+                    break;
+                case 'settings':
+                    // Atualizar switches
+                    elements.soundToggleSwitch.checked = AppState.settings.sounds;
+                    elements.notificationToggleSwitch.checked = AppState.settings.notifications;
+                    elements.darkModeSwitch.checked = AppState.settings.darkMode;
+                    break;
+            }
         }
         
-        function generateFood() {
-            const segmentSize = 20;
-            const max = canvas.width / segmentSize;
+        // ===== SISTEMA DE INTERFACE =====
+        function initUI() {
+            // Atualizar progresso
+            updateProgress();
             
-            let newFood;
+            // Atualizar objetivos
+            updateGoals();
             
-            do {
-                const isSpecial = Math.random() > 0.8;
-                let chosenFruitType = isSpecial ? 'gold' : FRUIT_TYPES[Math.floor(Math.random() * FRUIT_TYPES.length)];
-                
-                newFood = {
-                    x: Math.floor(Math.random() * max),
-                    y: Math.floor(Math.random() * max),
-                    type: isSpecial ? 'special' : 'normal',
-                    fruitType: chosenFruitType
-                };
-            } while (snake.some(segment => segment.x === newFood.x && segment.y === newFood.y));
+            // Atualizar estatísticas
+            updateStats();
             
-            food = newFood;
-        }
-
-        function update() {
-            if (!gameRunning) return;
+            // Renderizar lista de exercícios
+            renderWorkoutList();
             
-            gameTick++;
-            direction = nextDirection;
+            // Configurar header buttons
+            elements.notificationBtn.addEventListener('click', function() {
+                playSound('click');
+                showNotification('Notificações', 'Você não tem novas notificações.');
+            });
             
-            const head = { x: snake[0].x, y: snake[0].y };
-            
-            if (direction === 'right') head.x++;
-            else if (direction === 'left') head.x--;
-            else if (direction === 'up') head.y--;
-            else if (direction === 'down') head.y++;
-            
-            const gridSize = 20;
-            const max = canvas.width / gridSize;
-            
-            if (head.x < 0 || head.x >= max || 
-                head.y < 0 || head.y >= max || 
-                snake.some(segment => segment.x === head.x && segment.y === head.y)) {
-                
-                gameOver();
-                return;
-            }
-            
-            snake.unshift(head);
-            
-            if (head.x === food.x && head.y === food.y) {
-                const points = food.type === 'special' ? 5 : 1;
-                score += points;
-                document.getElementById('score').textContent = score;
-                
-                if (score > highScore) {
-                    highScore = score;
-                    document.getElementById('highScore').textContent = highScore;
-                }
-                
-                generateFood();
-                playSound('eat');
-            } else {
-                snake.pop();
-            }
-            
-            draw();
-        }
-
-        function handleKeyPress(e) {
-            if (!gameRunning) {
-                if (e.key === 'p' || e.key === 'P') togglePause();
-                return;
-            }
-            
-            if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
-                if (direction !== 'left') nextDirection = 'right';
-            } else if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
-                if (direction !== 'right') nextDirection = 'left';
-            } else if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
-                if (direction !== 'down') nextDirection = 'up';
-            } else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
-                if (direction !== 'up') nextDirection = 'down';
-            } else if (e.key === 'p' || e.key === 'P') {
-                togglePause();
-            } else if (e.key === 'r' || e.key === 'R') {
-                resetGame();
-            }
-        }
-
-        function togglePause() {
-            if (gameRunning) {
-                clearInterval(gameLoop);
-                gameRunning = false;
-                document.getElementById('pauseBtn').innerHTML = '<i class="fas fa-play"></i> CONTINUAR';
-            } else {
-                gameLoop = setInterval(update, gameSpeed);
-                gameRunning = true;
-                document.getElementById('pauseBtn').innerHTML = '<i class="fas fa-pause"></i> PAUSAR';
-            }
-        }
-
-        function resetGame() {
-            if (gameLoop) clearInterval(gameLoop);
-            initGame();
+            elements.soundToggle.addEventListener('click', function() {
+                playSound('click');
+                AppState.settings.sounds = !AppState.settings.sounds;
+                const icon = this.querySelector('i');
+                icon.className = AppState.settings.sounds ? 'fas fa-volume-up' : 'fas fa-volume-mute';
+                showNotification('Sons', AppState.settings.sounds ? 'Sons ativados!' : 'Sons desativados.');
+                saveAppData();
+            });
         }
         
-        function gameOver() {
-            gameRunning = false;
-            clearInterval(gameLoop);
+        // ===== SISTEMA DE TREINOS =====
+        function renderWorkoutList() {
+            if (!elements.workoutList) return;
             
-            updateRanking(score);
+            elements.workoutList.innerHTML = '';
             
-            document.getElementById('pauseBtn').innerHTML = '<i class="fas fa-gamepad"></i> JOGAR NOVAMENTE';
-            alert(`GAME OVER! Sua pontuação: ${score}`);
+            AppState.workout.routine.forEach((exercise, index) => {
+                const exerciseElement = document.createElement('div');
+                exerciseElement.className = `workout-item ${exercise.completed ? 'completed' : ''}`;
+                exerciseElement.style.animationDelay = `${index * 0.1}s`;
+                
+                exerciseElement.innerHTML = `
+                    <div class="workout-checkbox ${exercise.completed ? 'checked' : ''}" data-id="${exercise.id}">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="workout-details">
+                        <div class="workout-name">${exercise.name}</div>
+                        <div class="workout-description">${exercise.description}</div>
+                        <div class="workout-type ${exercise.type}">
+                            ${exercise.type === 'warmup' ? 'Aquecimento' : 
+                              exercise.type === 'exercise' ? 'Exercício' : 'Descanso'}
+                        </div>
+                    </div>
+                    <div class="workout-actions">
+                        <button class="workout-action-btn" data-id="${exercise.id}" title="Demonstração">
+                            <i class="fas fa-play-circle"></i>
+                        </button>
+                    </div>
+                `;
+                
+                // Adicionar evento de clique no checkbox
+                const checkbox = exerciseElement.querySelector('.workout-checkbox');
+                checkbox.addEventListener('click', () => toggleExercise(exercise.id));
+                
+                elements.workoutList.appendChild(exerciseElement);
+            });
+            
+            // Atualizar progresso
+            updateProgress();
         }
         
-        /**
-         * Função de desenho principal, incluindo a renderização de imagens das frutas.
-         */
-        function draw() {
-            // 1. Desenha o fundo
-            ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg-screen');
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            const baseColor = document.getElementById('snakeColor').value || '#5865F2';
-            const darkColor = shadeColor(baseColor, -20);
-            const segmentSize = 20;
+        function toggleExercise(id) {
+            playSound('click');
             
-            const amplitude = 1.5; 
-            const frequency = 0.5;
-            const speed = 0.2;
-            
-            // Função auxiliar para desenhar cantos arredondados
-            const drawRoundedRect = (color, rectX, rectY, width, height, r) => {
-                ctx.fillStyle = color;
-                ctx.beginPath();
-                ctx.moveTo(rectX + r, rectY);
-                ctx.lineTo(rectX + width - r, rectY);
-                ctx.arcTo(rectX + width, rectY, rectX + width, rectY + r, r);
-                ctx.lineTo(rectX + width, rectY + height - r);
-                ctx.arcTo(rectX + width, rectY + height, rectX + width - r, rectX + height, r);
-                ctx.lineTo(rectX + r, rectY + height);
-                ctx.arcTo(rectX, rectY + height, rectX, rectY + height - r, r);
-                ctx.lineTo(rectX, rectY + r);
-                ctx.arcTo(rectX, rectY, rectX + r, rectY, r);
-                ctx.closePath();
-                ctx.fill();
-            };
-
-            // 2. Desenho da Cobra
-            snake.forEach((segment, index) => {
-                const x = segment.x * segmentSize;
-                let y = segment.y * segmentSize;
-                const radius = 3; 
+            const exercise = AppState.workout.routine.find(ex => ex.id === id);
+            if (exercise) {
+                exercise.completed = !exercise.completed;
+                renderWorkoutList();
                 
-                let offsetY = 0;
-                if (index > 0) {
-                    const angle = gameTick * speed + index * frequency;
-                    offsetY = amplitude * Math.sin(angle);
-                    y += offsetY; 
-                }
-                
-                if (index > 0) {
-                    drawRoundedRect(darkColor, x, y, segmentSize, segmentSize, radius);
-                    drawRoundedRect(baseColor, x + 2, y + 2, segmentSize - 4, segmentSize - 4, radius);
-                } 
-                else {
-                    ctx.fillStyle = baseColor;
-                    ctx.fillRect(x - 1, y - 1, segmentSize + 2, segmentSize + 2); 
-                    ctx.fillStyle = darkColor;
-                    ctx.fillRect(x, y, segmentSize, segmentSize); 
+                if (exercise.completed) {
+                    // Adicionar calorias e minutos
+                    AppState.stats.calories += 50;
+                    AppState.stats.minutes += Math.ceil(exercise.time / 60);
                     
-                    // Olhos
-                    ctx.fillStyle = 'black';
-                    const eyeSize = 2;
-                    if (direction === 'right') {
-                        ctx.fillRect(x + 13, y + 3, eyeSize, eyeSize);
-                        ctx.fillRect(x + 13, y + 13, eyeSize, eyeSize);
-                    } else if (direction === 'left') {
-                        ctx.fillRect(x + 5, y + 3, eyeSize, eyeSize);
-                        ctx.fillRect(x + 5, y + 13, eyeSize, eyeSize);
-                    } else if (direction === 'up') {
-                        ctx.fillRect(x + 3, y + 5, eyeSize, eyeSize);
-                        ctx.fillRect(x + 15, y + 5, eyeSize, eyeSize);
-                    } else if (direction === 'down') {
-                        ctx.fillRect(x + 3, y + 15, eyeSize, eyeSize);
-                        ctx.fillRect(x + 15, y + 15, eyeSize, eyeSize);
+                    // Atualizar estatísticas
+                    updateStats();
+                    
+                    // Mostrar notificação
+                    showNotification('Exercício Concluído!', `${exercise.name} marcado como completo.`);
+                    
+                    // Tocar som
+                    playSound('complete');
+                    
+                    // Verificar se todos os exercícios foram completados
+                    checkAllExercisesCompleted();
+                }
+                
+                saveAppData();
+            }
+        }
+        
+        function checkAllExercisesCompleted() {
+            const allCompleted = AppState.workout.routine.every(ex => ex.completed);
+            if (allCompleted && !AppState.workout.completedToday) {
+                AppState.workout.completedToday = true;
+                AppState.stats.workouts++;
+                
+                // Verificar streak
+                const today = new Date().toDateString();
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                
+                if (AppState.stats.lastWorkoutDate === yesterday.toDateString()) {
+                    AppState.stats.streak++;
+                } else if (AppState.stats.lastWorkoutDate !== today) {
+                    AppState.stats.streak = 1;
+                }
+                
+                AppState.stats.lastWorkoutDate = today;
+                
+                // Adicionar ao histórico
+                const now = new Date();
+                AppState.history.unshift({
+                    date: now.toLocaleDateString('pt-BR'),
+                    time: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+                    exercises: AppState.workout.routine.filter(ex => ex.completed).length,
+                    totalExercises: AppState.workout.routine.length
+                });
+                
+                // Limitar histórico a 50 itens
+                if (AppState.history.length > 50) {
+                    AppState.history = AppState.history.slice(0, 50);
+                }
+                
+                // Atualizar interface
+                updateStats();
+                renderHistory();
+                
+                // Mostrar confetti visual
+                showConfetti();
+                
+                // Mostrar notificação especial
+                showNotification('🎉 Parabéns!', 'Você completou todo o treino de hoje!', 'success');
+                playSound('complete');
+                
+                saveAppData();
+            }
+        }
+        
+        function updateProgress() {
+            const completedExercises = AppState.workout.routine.filter(ex => ex.completed).length;
+            const totalExercises = AppState.workout.routine.length;
+            const percentage = (completedExercises / totalExercises) * 100;
+            
+            if (elements.progressPercentage) {
+                elements.progressPercentage.textContent = `${Math.round(percentage)}%`;
+            }
+            
+            if (elements.progressFill) {
+                elements.progressFill.style.width = `${percentage}%`;
+            }
+            
+            if (elements.progressExercises) {
+                elements.progressExercises.textContent = `${completedExercises}/${totalExercises} exercícios`;
+            }
+            
+            // Calcular tempo estimado restante
+            const remainingExercises = totalExercises - completedExercises;
+            const estimatedTime = Math.ceil(remainingExercises * 2); // 2 minutos por exercício em média
+            if (elements.progressTime) {
+                elements.progressTime.textContent = `Tempo estimado: ${estimatedTime} min`;
+            }
+        }
+        
+        // ===== SISTEMA DE TIMERS =====
+        function initTimerEvents() {
+            // Timer de prancha
+            elements.plankStart.addEventListener('click', () => startTimer('plank'));
+            elements.plankPause.addEventListener('click', () => pauseTimer('plank'));
+            elements.plankReset.addEventListener('click', () => resetTimer('plank'));
+            
+            // Timer de descanso
+            elements.restStart.addEventListener('click', () => startTimer('rest'));
+            elements.restPause.addEventListener('click', () => pauseTimer('rest'));
+            elements.restReset.addEventListener('click', () => resetTimer('rest'));
+        }
+        
+        function startTimer(timerType) {
+            if (AppState.timers[timerType].running) return;
+            
+            playSound('timerStart');
+            
+            AppState.timers[timerType].running = true;
+            const timerElement = timerType === 'plank' ? elements.plankTimer : elements.restTimer;
+            const startBtn = timerType === 'plank' ? elements.plankStart : elements.restStart;
+            const pauseBtn = timerType === 'plank' ? elements.plankPause : elements.restPause;
+            
+            startBtn.style.display = 'none';
+            pauseBtn.style.display = 'flex';
+            
+            AppState.timers[timerType].interval = setInterval(() => {
+                AppState.timers[timerType].time--;
+                
+                if (timerElement) {
+                    timerElement.textContent = `${AppState.timers[timerType].time}s`;
+                    
+                    // Efeitos visuais para contagem regressiva
+                    if (AppState.timers[timerType].time <= 10) {
+                        timerElement.style.color = 'var(--primary-orange)';
+                    }
+                    if (AppState.timers[timerType].time <= 5) {
+                        timerElement.style.color = 'var(--primary-red)';
+                        timerElement.classList.add('animate-pulse');
+                    }
+                }
+                
+                if (AppState.timers[timerType].time <= 0) {
+                    clearInterval(AppState.timers[timerType].interval);
+                    AppState.timers[timerType].running = false;
+                    
+                    if (timerElement) {
+                        timerElement.textContent = timerType === 'plank' ? '30s' : '60s';
+                        timerElement.style.color = '';
+                        timerElement.classList.remove('animate-pulse');
+                    }
+                    
+                    startBtn.style.display = 'flex';
+                    pauseBtn.style.display = 'none';
+                    
+                    // Resetar tempo
+                    AppState.timers[timerType].time = timerType === 'plank' ? 30 : 60;
+                    
+                    // Tocar som
+                    playSound('timerEnd');
+                    
+                    // Mostrar notificação
+                    showNotification(
+                        timerType === 'plank' ? 'Prancha Concluída!' : 'Descanso Concluído!',
+                        timerType === 'plank' ? 'Excelente! Continue assim.' : 'Hora de voltar aos exercícios!'
+                    );
+                    
+                    // Vibrar se suportado
+                    if (navigator.vibrate) {
+                        navigator.vibrate([200, 100, 200]);
+                    }
+                }
+            }, 1000);
+        }
+        
+        function pauseTimer(timerType) {
+            if (!AppState.timers[timerType].running) return;
+            
+            clearInterval(AppState.timers[timerType].interval);
+            AppState.timers[timerType].running = false;
+            
+            const startBtn = timerType === 'plank' ? elements.plankStart : elements.restStart;
+            const pauseBtn = timerType === 'plank' ? elements.plankPause : elements.restPause;
+            
+            startBtn.style.display = 'flex';
+            pauseBtn.style.display = 'none';
+            
+            playSound('click');
+        }
+        
+        function resetTimer(timerType) {
+            clearInterval(AppState.timers[timerType].interval);
+            AppState.timers[timerType].running = false;
+            
+            const timerElement = timerType === 'plank' ? elements.plankTimer : elements.restTimer;
+            const startBtn = timerType === 'plank' ? elements.plankStart : elements.restStart;
+            const pauseBtn = timerType === 'plank' ? elements.plankPause : elements.restPause;
+            
+            AppState.timers[timerType].time = timerType === 'plank' ? 30 : 60;
+            
+            if (timerElement) {
+                timerElement.textContent = timerType === 'plank' ? '30s' : '60s';
+                timerElement.style.color = '';
+                timerElement.classList.remove('animate-pulse');
+            }
+            
+            startBtn.style.display = 'flex';
+            pauseBtn.style.display = 'none';
+            
+            playSound('click');
+        }
+        
+        // ===== SISTEMA DE ESTATÍSTICAS =====
+        function updateStats() {
+            if (elements.statCalories) {
+                elements.statCalories.textContent = AppState.stats.calories;
+            }
+            
+            if (elements.statMinutes) {
+                elements.statMinutes.textContent = AppState.stats.minutes;
+            }
+            
+            if (elements.statWorkouts) {
+                elements.statWorkouts.textContent = AppState.stats.workouts;
+            }
+            
+            if (elements.statStreak) {
+                elements.statStreak.textContent = AppState.stats.streak;
+            }
+        }
+        
+        function renderHistory() {
+            if (!elements.historyList) return;
+            
+            if (AppState.history.length === 0) {
+                elements.historyList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-history empty-state-icon"></i>
+                        <h3 class="empty-state-title">Nenhum treino registrado</h3>
+                        <p class="empty-state-text">Complete seu primeiro treino para ver o histórico aqui.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            elements.historyList.innerHTML = '';
+            
+            AppState.history.forEach((item, index) => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.style.animationDelay = `${index * 0.05}s`;
+                
+                historyItem.innerHTML = `
+                    <div>
+                        <div class="history-date">${item.date}</div>
+                        <div class="history-time">${item.time}</div>
+                    </div>
+                    <div class="history-stats">
+                        <div class="history-stat">
+                            <div class="history-stat-value">${item.exercises}/${item.totalExercises}</div>
+                            <div class="history-stat-label">Exercícios</div>
+                        </div>
+                    </div>
+                `;
+                
+                elements.historyList.appendChild(historyItem);
+            });
+        }
+        
+        // ===== SISTEMA DE CONFIGURAÇÕES =====
+        function updateGoals() {
+            if (elements.goalCalories) {
+                elements.goalCalories.textContent = AppState.goals.calories;
+            }
+            
+            if (elements.goalMinutes) {
+                elements.goalMinutes.textContent = AppState.goals.minutes;
+            }
+            
+            if (elements.goalWorkouts) {
+                elements.goalWorkouts.textContent = AppState.goals.workouts;
+            }
+        }
+        
+        // ===== SISTEMA DE NOTIFICAÇÕES =====
+        function showNotification(title, message, type = 'info') {
+            // Criar elemento de notificação
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            
+            // Ícone baseado no tipo
+            let icon = 'fas fa-info-circle';
+            if (type === 'success') icon = 'fas fa-check-circle';
+            if (type === 'error') icon = 'fas fa-exclamation-triangle';
+            
+            notification.innerHTML = `
+                <div class="notification-icon">
+                    <i class="${icon}"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">${title}</div>
+                    <div class="notification-message">${message}</div>
+                </div>
+                <button class="notification-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            // Adicionar ao container
+            elements.notificationContainer.appendChild(notification);
+            
+            // Mostrar com animação
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 10);
+            
+            // Evento para fechar
+            const closeBtn = notification.querySelector('.notification-close');
+            closeBtn.addEventListener('click', () => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            });
+            
+            // Remover automaticamente após 5 segundos
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.classList.remove('show');
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.remove();
+                        }
+                    }, 300);
+                }
+            }, 5000);
+            
+            // Tocar som se notificações estiverem ativas
+            if (AppState.settings.notifications) {
+                playSound('notification');
+            }
+        }
+        
+        // ===== SISTEMA DE SONS =====
+        function playSound(soundType) {
+            if (!AppState.settings.sounds) return;
+            
+            const sound = elements.sounds[soundType];
+            if (sound) {
+                sound.currentTime = 0;
+                sound.play().catch(e => console.log('Erro ao tocar som:', e));
+            }
+        }
+        
+        // ===== SISTEMA DE DADOS =====
+        function loadAppData() {
+            try {
+                // Carregar dados do localStorage
+                const savedData = localStorage.getItem('fitTrackProData');
+                if (savedData) {
+                    const parsedData = JSON.parse(savedData);
+                    
+                    // Mesclar dados salvos com estado padrão
+                    Object.assign(AppState.user, parsedData.user || {});
+                    Object.assign(AppState.settings, parsedData.settings || {});
+                    Object.assign(AppState.stats, parsedData.stats || {});
+                    Object.assign(AppState.goals, parsedData.goals || {});
+                    
+                    // Carregar histórico
+                    if (parsedData.history) {
+                        AppState.history = parsedData.history;
+                    }
+                    
+                    // Carregar rotina de treino (se existir)
+                    if (parsedData.workout && parsedData.workout.routine) {
+                        AppState.workout.routine = parsedData.workout.routine;
+                    }
+                    
+                    console.log('Dados carregados do localStorage');
+                }
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+            }
+        }
+        
+        function saveAppData() {
+            try {
+                const dataToSave = {
+                    user: AppState.user,
+                    settings: AppState.settings,
+                    stats: AppState.stats,
+                    goals: AppState.goals,
+                    history: AppState.history,
+                    workout: AppState.workout
+                };
+                
+                localStorage.setItem('fitTrackProData', JSON.stringify(dataToSave));
+                console.log('Dados salvos no localStorage');
+            } catch (error) {
+                console.error('Erro ao salvar dados:', error);
+            }
+        }
+        
+        // ===== EVENTOS =====
+        function initEvents() {
+            // Página Inicial
+            elements.startTutorial?.addEventListener('click', function() {
+                playSound('click');
+                showNotification('Tutorial', 'Em breve: Tutorial interativo do app!');
+            });
+            
+            elements.startWorkout?.addEventListener('click', function() {
+                playSound('click');
+                // Navegar para página de treinos
+                elements.navButtons.forEach(btn => btn.classList.remove('active'));
+                document.querySelector('.nav-btn[data-page="workouts"]').classList.add('active');
+                elements.pages.forEach(page => page.classList.remove('active'));
+                document.getElementById('page-workouts').classList.add('active');
+                renderWorkoutList();
+                initTimerEvents();
+            });
+            
+            elements.editWorkout?.addEventListener('click', function() {
+                playSound('click');
+                openWorkoutModal();
+            });
+            
+            // Página de Treinos
+            elements.completeWorkout?.addEventListener('click', function() {
+                playSound('click');
+                
+                const completedExercises = AppState.workout.routine.filter(ex => ex.completed).length;
+                if (completedExercises === 0) {
+                    showNotification('Ops!', 'Nenhum exercício foi completado ainda.', 'error');
+                    playSound('error');
+                    return;
+                }
+                
+                // Marcar todos como completos
+                AppState.workout.routine.forEach(ex => ex.completed = true);
+                renderWorkoutList();
+                checkAllExercisesCompleted();
+                
+                showNotification('Treino Finalizado!', 'Parabéns por completar seu treino!');
+            });
+            
+            elements.resetWorkout?.addEventListener('click', function() {
+                playSound('click');
+                
+                if (confirm('Tem certeza que deseja reiniciar o treino? Isso irá desmarcar todos os exercícios.')) {
+                    AppState.workout.routine.forEach(ex => ex.completed = false);
+                    AppState.workout.completedToday = false;
+                    renderWorkoutList();
+                    showNotification('Treino Reiniciado', 'Todos os exercícios foram resetados.');
+                }
+            });
+            
+            // Página de Estatísticas
+            elements.clearHistory?.addEventListener('click', function() {
+                playSound('click');
+                
+                if (AppState.history.length === 0) {
+                    showNotification('Histórico Vazio', 'Não há histórico para limpar.', 'error');
+                    playSound('error');
+                    return;
+                }
+                
+                if (confirm('Tem certeza que deseja limpar todo o histórico de treinos?')) {
+                    AppState.history = [];
+                    renderHistory();
+                    saveAppData();
+                    showNotification('Histórico Limpo', 'Todo o histórico foi removido.');
+                }
+            });
+            
+            // Página de Configurações
+            elements.editProfile?.addEventListener('click', function() {
+                playSound('click');
+                openProfileModal();
+            });
+            
+            elements.soundToggleSwitch?.addEventListener('change', function() {
+                AppState.settings.sounds = this.checked;
+                saveAppData();
+                showNotification('Sons', this.checked ? 'Sons ativados!' : 'Sons desativados.');
+            });
+            
+            elements.notificationToggleSwitch?.addEventListener('change', function() {
+                AppState.settings.notifications = this.checked;
+                saveAppData();
+                showNotification('Notificações', this.checked ? 'Notificações ativadas!' : 'Notificações desativadas.');
+            });
+            
+            elements.darkModeSwitch?.addEventListener('change', function() {
+                AppState.settings.darkMode = this.checked;
+                saveAppData();
+                showNotification('Tema', this.checked ? 'Modo escuro ativado!' : 'Modo escuro desativado.');
+            });
+            
+            elements.customizeWorkout?.addEventListener('click', function() {
+                playSound('click');
+                openWorkoutModal();
+            });
+            
+            elements.visitInstagram?.addEventListener('click', function() {
+                playSound('click');
+                window.open('https://instagram.com/everton.lima_17', '_blank');
+            });
+            
+            // Modais
+            elements.closeProfileModal?.addEventListener('click', function() {
+                playSound('click');
+                closeModal('profile');
+            });
+            
+            elements.profileForm?.addEventListener('submit', function(e) {
+                e.preventDefault();
+                playSound('click');
+                
+                // Salvar dados do perfil
+                AppState.user.name = elements.userName.value;
+                AppState.user.age = elements.userAge.value ? parseInt(elements.userAge.value) : null;
+                AppState.user.weight = elements.userWeight.value ? parseFloat(elements.userWeight.value) : null;
+                AppState.user.goal = elements.userGoal.value;
+                
+                saveAppData();
+                closeModal('profile');
+                
+                showNotification('Perfil Atualizado', 'Suas informações foram salvas com sucesso!', 'success');
+            });
+            
+            elements.closeWorkoutModal?.addEventListener('click', function() {
+                playSound('click');
+                closeModal('workout');
+            });
+            
+            elements.addExercise?.addEventListener('click', function() {
+                playSound('click');
+                addNewExercise();
+            });
+            
+            elements.saveWorkout?.addEventListener('click', function() {
+                playSound('click');
+                saveWorkoutChanges();
+            });
+            
+            // Eventos de teclado (ESC para fechar modais)
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    if (elements.profileModal.classList.contains('active')) {
+                        closeModal('profile');
+                    }
+                    if (elements.workoutModal.classList.contains('active')) {
+                        closeModal('workout');
                     }
                 }
             });
-
-            // 3. Desenho das Frutas com IMAGENS
-            const foodX = food.x * segmentSize;
-            const foodY = food.y * segmentSize;
-            const fruitType = food.fruitType;
             
-            if (fruitImages[fruitType] && fruitImages[fruitType].complete && fruitImages[fruitType].naturalWidth > 0) {
-                const imgSize = segmentSize * 1.2;
-                const offset = (imgSize - segmentSize) / 2;
+            // Fechar modais ao clicar fora
+            document.querySelectorAll('.modal-overlay').forEach(overlay => {
+                overlay.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        if (this.id === 'profile-modal') closeModal('profile');
+                        if (this.id === 'workout-modal') closeModal('workout');
+                    }
+                });
+            });
+        }
+        
+        // ===== SISTEMA DE MODAIS =====
+        function openProfileModal() {
+            // Preencher formulário com dados atuais
+            elements.userName.value = AppState.user.name || '';
+            elements.userAge.value = AppState.user.age || '';
+            elements.userWeight.value = AppState.user.weight || '';
+            elements.userGoal.value = AppState.user.goal || 'lose';
+            
+            // Mostrar modal
+            elements.profileModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function openWorkoutModal() {
+            // Renderizar lista de exercícios editáveis
+            renderWorkoutEditList();
+            
+            // Mostrar modal
+            elements.workoutModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeModal(modalType) {
+            if (modalType === 'profile') {
+                elements.profileModal.classList.remove('active');
+            } else if (modalType === 'workout') {
+                elements.workoutModal.classList.remove('active');
+            }
+            
+            document.body.style.overflow = 'auto';
+            playSound('click');
+        }
+        
+        function renderWorkoutEditList() {
+            if (!elements.workoutEditList) return;
+            
+            elements.workoutEditList.innerHTML = '';
+            
+            AppState.workout.routine.forEach((exercise, index) => {
+                const exerciseElement = document.createElement('div');
+                exerciseElement.className = 'workout-item';
                 
-                ctx.drawImage(
-                    fruitImages[fruitType],
-                    foodX - offset,
-                    foodY - offset,
-                    imgSize,
-                    imgSize
-                );
+                exerciseElement.innerHTML = `
+                    <div class="workout-details" style="flex-grow: 1;">
+                        <input type="text" class="form-control mb-2" value="${exercise.name}" data-index="${index}" data-field="name">
+                        <input type="text" class="form-control" value="${exercise.description}" data-index="${index}" data-field="description">
+                        <div class="d-flex gap-2 mt-2">
+                            <select class="form-control" data-index="${index}" data-field="type">
+                                <option value="warmup" ${exercise.type === 'warmup' ? 'selected' : ''}>Aquecimento</option>
+                                <option value="exercise" ${exercise.type === 'exercise' ? 'selected' : ''}>Exercício</option>
+                                <option value="rest" ${exercise.type === 'rest' ? 'selected' : ''}>Descanso</option>
+                            </select>
+                            <input type="number" class="form-control" value="${exercise.time}" data-index="${index}" data-field="time" min="10" max="300" placeholder="Segundos">
+                        </div>
+                    </div>
+                    <button class="workout-action-btn delete-exercise" data-index="${index}" title="Remover">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                `;
                 
-                // Brilho especial para frutas especiais (Ex: gold)
-                if (food.type === 'special') {
-                    ctx.save();
-                    ctx.globalAlpha = 0.3;
-                    ctx.fillStyle = 'rgba(255, 215, 0, 0.5)';
-                    ctx.beginPath();
-                    ctx.arc(foodX + segmentSize/2, foodY + segmentSize/2, segmentSize/2 + 2, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.restore();
+                elements.workoutEditList.appendChild(exerciseElement);
+            });
+            
+            // Adicionar eventos para os inputs
+            document.querySelectorAll('#workout-edit-list input, #workout-edit-list select').forEach(input => {
+                input.addEventListener('change', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    const field = this.getAttribute('data-field');
+                    const value = this.value;
+                    
+                    if (field === 'time') {
+                        AppState.workout.routine[index][field] = parseInt(value);
+                    } else {
+                        AppState.workout.routine[index][field] = value;
+                    }
+                });
+            });
+            
+            // Adicionar eventos para botões de deletar
+            document.querySelectorAll('.delete-exercise').forEach(button => {
+                button.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    
+                    if (AppState.workout.routine.length > 1) {
+                        AppState.workout.routine.splice(index, 1);
+                        renderWorkoutEditList();
+                        playSound('click');
+                    } else {
+                        showNotification('Erro', 'O treino deve ter pelo menos um exercício.', 'error');
+                        playSound('error');
+                    }
+                });
+            });
+        }
+        
+        function addNewExercise() {
+            const newExercise = {
+                id: AppState.workout.routine.length + 1,
+                name: "Novo Exercício",
+                description: "Descrição do exercício",
+                completed: false,
+                type: "exercise",
+                time: 60
+            };
+            
+            AppState.workout.routine.push(newExercise);
+            renderWorkoutEditList();
+            playSound('click');
+        }
+        
+        function saveWorkoutChanges() {
+            // Reatribuir IDs sequenciais
+            AppState.workout.routine.forEach((exercise, index) => {
+                exercise.id = index + 1;
+            });
+            
+            // Resetar estado de completado
+            AppState.workout.routine.forEach(exercise => exercise.completed = false);
+            AppState.workout.completedToday = false;
+            
+            // Salvar dados
+            saveAppData();
+            
+            // Fechar modal
+            closeModal('workout');
+            
+            // Atualizar interface
+            renderWorkoutList();
+            updateProgress();
+            
+            // Mostrar notificação
+            showNotification('Treino Atualizado', 'Sua rotina de treino foi personalizada com sucesso!', 'success');
+            playSound('complete');
+        }
+        
+        // ===== EFEITOS VISUAIS =====
+        function showConfetti() {
+            // Criar elementos de confetti
+            const colors = ['#8a2be2', '#00cc66', '#3399ff', '#ff4757', '#ff9900'];
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.position = 'fixed';
+                confetti.style.width = '10px';
+                confetti.style.height = '10px';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.borderRadius = '50%';
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.top = '-10px';
+                confetti.style.zIndex = '9999';
+                confetti.style.pointerEvents = 'none';
+                
+                document.body.appendChild(confetti);
+                
+                // Animar confetti
+                const animation = confetti.animate([
+                    { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+                    { transform: `translateY(${window.innerHeight + 100}px) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+                ], {
+                    duration: Math.random() * 3000 + 2000,
+                    easing: 'cubic-bezier(0.215, 0.610, 0.355, 1)'
+                });
+                
+                // Remover após animação
+                animation.onfinish = () => {
+                    confetti.remove();
+                };
+            }
+        }
+        
+        // ===== INICIALIZAR TIMERS =====
+        initTimerEvents();
+        
+        // ===== VERIFICAR STREAK DIÁRIO =====
+        function checkDailyStreak() {
+            const today = new Date().toDateString();
+            const lastWorkout = AppState.stats.lastWorkoutDate;
+            
+            if (lastWorkout) {
+                const lastWorkoutDate = new Date(lastWorkout);
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                
+                // Se o último treino foi anteontem ou antes, resetar streak
+                if (lastWorkoutDate.toDateString() !== yesterday.toDateString() && 
+                    lastWorkoutDate.toDateString() !== today) {
+                    AppState.stats.streak = 0;
+                    saveAppData();
                 }
-            } else {
-                // Fallback: desenho geométrico simples
-                const foodCenterX = foodX + segmentSize / 2;
-                const foodCenterY = foodY + segmentSize / 2;
-                const radiusFood = 8;
+            }
+        }
+        
+        // Verificar streak ao iniciar app
+        checkDailyStreak();
+        
+        // ===== NOTIFICAÇÕES PROGRAMADAS =====
+        function scheduleNotifications() {
+            // Verificar se é hora de treinar (exemplo: 18:00)
+            const now = new Date();
+            const workoutHour = 18; // 18:00
+            
+            if (now.getHours() === workoutHour && now.getMinutes() === 0) {
+                if (AppState.settings.notifications && !AppState.workout.completedToday) {
+                    showNotification('Hora de Treinar!', 'Não se esqueça do seu treino diário! 💪');
+                }
+            }
+        }
+        
+        // Verificar notificações a cada minuto
+        setInterval(scheduleNotifications, 60000);
+        
+        // ===== AJUSTES PARA MOBILE =====
+        function handleMobileGestures() {
+            let startX = 0;
+            let endX = 0;
+            
+            document.addEventListener('touchstart', function(e) {
+                startX = e.changedTouches[0].screenX;
+            });
+            
+            document.addEventListener('touchend', function(e) {
+                endX = e.changedTouches[0].screenX;
+                const diffX = startX - endX;
                 
-                ctx.fillStyle = food.type === 'special' ? 'gold' : 'red';
-                ctx.beginPath();
-                ctx.arc(foodCenterX, foodCenterY, radiusFood, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.strokeStyle = '#800000';
-                ctx.lineWidth = 2;
-                ctx.stroke();
+                // Swipe left (próxima página)
+                if (diffX > 50) {
+                    navigateToNextPage();
+                }
+                // Swipe right (página anterior)
+                else if (diffX < -50) {
+                    navigateToPreviousPage();
+                }
+            });
+        }
+        
+        function navigateToNextPage() {
+            const currentPage = document.querySelector('.page.active').id.replace('page-', '');
+            const pages = ['home', 'workouts', 'stats', 'settings'];
+            const currentIndex = pages.indexOf(currentPage);
+            
+            if (currentIndex < pages.length - 1) {
+                // Simular clique no próximo botão de navegação
+                document.querySelector(`.nav-btn[data-page="${pages[currentIndex + 1]}"]`).click();
             }
         }
-
-
-        // =========================================================
-        // LISTENERS GERAIS E INICIALIZAÇÃO
-        // =========================================================
-
-        function setupEventListeners() {
-            if(document.getElementById('themeSwitch')) {
-                document.getElementById('themeSwitch').addEventListener('change', toggleTheme);
-            }
+        
+        function navigateToPreviousPage() {
+            const currentPage = document.querySelector('.page.active').id.replace('page-', '');
+            const pages = ['home', 'workouts', 'stats', 'settings'];
+            const currentIndex = pages.indexOf(currentPage);
             
-            // --- Botões do Menu ---
-            document.getElementById('btnStartGame').addEventListener('click', function() {
-                criarBolinhasCaindo(20, this);
-                transicionarTela('menuScreen', 'gameScreen', initGame);
-            });
-            
-            document.getElementById('btnShowSettings').addEventListener('click', function() {
-                criarBolinhasCaindo(15, this);
-                transicionarTela('menuScreen', 'settingsScreen', loadSettings);
-            });
-            
-            document.getElementById('btnShowRanking').addEventListener('click', function() {
-                criarBolinhasCaindo(15, this);
-                transicionarTela('menuScreen', 'rankingScreen', loadRanking);
-            });
-            
-            document.getElementById('btnShowHelp').addEventListener('click', function() {
-                criarBolinhasCaindo(15, this);
-                transicionarTela('menuScreen', 'helpScreen');
-            });
-            
-            document.getElementById('btnShowAbout').addEventListener('click', function() {
-                criarBolinhasCaindo(15, this);
-                transicionarTela('menuScreen', 'aboutScreen');
-            });
-            
-            // --- Botões Voltar ---
-            document.getElementById('btnBackGame').addEventListener('click', function() {
-                criarBolinhasCaindo(15, this);
-                transicionarTela('gameScreen', 'menuScreen', function() {
-                    if (gameLoop) clearInterval(gameLoop);
-                    gameRunning = false;
-                });
-            });
-            
-            document.getElementById('btnBackSettings').addEventListener('click', function() {
-                criarBolinhasCaindo(15, this);
-                transicionarTela('settingsScreen', 'menuScreen');
-            });
-            
-            document.getElementById('btnBackRanking').addEventListener('click', function() {
-                criarBolinhasCaindo(15, this);
-                transicionarTela('rankingScreen', 'menuScreen');
-            });
-            
-            document.getElementById('btnBackHelp').addEventListener('click', function() {
-                criarBolinhasCaindo(15, this);
-                transicionarTela('helpScreen', 'menuScreen');
-            });
-            
-            document.getElementById('btnBackAbout').addEventListener('click', function() {
-                criarBolinhasCaindo(15, this);
-                transicionarTela('aboutScreen', 'menuScreen');
-            });
-            
-            // Botões do jogo e salvar configurações
-            if(document.getElementById('pauseBtn')) document.getElementById('pauseBtn').addEventListener('click', togglePause);
-            if(document.getElementById('resetBtn')) document.getElementById('resetBtn').addEventListener('click', resetGame);
-            
-            if(document.getElementById('btnSaveSettings')) {
-                document.getElementById('btnSaveSettings').addEventListener('click', function() {
-                    criarBolinhasCaindo(10, this);
-                    saveSettings(); 
-                });
+            if (currentIndex > 0) {
+                // Simular clique no botão de navegação anterior
+                document.querySelector(`.nav-btn[data-page="${pages[currentIndex - 1]}"]`).click();
             }
         }
-
-        // Inicialização ao carregar a página
-        window.onload = function() {
-            loadTheme();
-            setupEventListeners();
-            hideAllScreens();
-            document.getElementById('menuScreen').style.display = 'flex';
-        };
-
+        
+        // Inicializar gestos para mobile
+        if ('ontouchstart' in window) {
+            handleMobileGestures();
+        }
+        
+        // ===== FINALIZAÇÃO =====
+        console.log('FitTrack Pro completamente inicializado!');
+        console.log('Status:', {
+            user: AppState.user.name ? 'Perfil configurado' : 'Perfil não configurado',
+            exercises: AppState.workout.routine.length,
+            history: AppState.history.length,
+            settings: AppState.settings
+        });
     </script>
 </body>
 </html>
-
